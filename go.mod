@@ -5,16 +5,14 @@ go 1.24.5
 require (
 	github.com/google/uuid v1.6.0
 	github.com/schollz/progressbar/v3 v3.18.0
-	github.com/ttab/clitools v0.4.0
+	github.com/ttab/clitools v0.5.2
 	github.com/ttab/elephant-api v0.18.0
-	github.com/ttab/elephantine v0.20.0
+	github.com/ttab/elephantine v0.20.2
 	github.com/ttab/flerr v0.1.0
 	github.com/urfave/cli/v2 v2.27.7
 	golang.org/x/oauth2 v0.30.0
-	google.golang.org/protobuf v1.36.7
+	google.golang.org/protobuf v1.36.8
 )
-
-replace github.com/ttab/clitools => ../clitools
 
 require (
 	github.com/MicahParks/jwkset v0.8.0 // indirect
@@ -23,6 +21,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
+	github.com/danjacques/gofslock v0.0.0-20240212154529-d899e02bfe22 // indirect
 	github.com/go-jose/go-jose/v4 v4.0.5 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.3 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect

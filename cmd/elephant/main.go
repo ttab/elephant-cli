@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -15,28 +16,10 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
-type envEndpoints struct {
-	Repository string
-	Index      string
-}
-
-var endpoints = map[string]envEndpoints{
-	"local": {
-		Repository: "https://repository.stage.tt.se",
-		Index:      "https://elephant-index.stage.tt.se",
-	},
-	"stage": {
-		Repository: "https://repository.stage.tt.se",
-		Index:      "https://elephant-index.stage.tt.se",
-	},
-	"prod": {
-		Repository: "https://repository.api.tt.ecms.se",
-		Index:      "https://index.api.tt.ecms.se",
-	},
-}
+const appName = "elephant-cli"
 
 func main() {
-	err := clitools.LoadEnv("elephant")
+	err := clitools.LoadEnv(appName)
 	if err != nil {
 		slog.Error("load environment config",
 			"err", err)
@@ -142,7 +125,7 @@ func main() {
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "doc-type",
-				Usage:    "Type of documents to copy",
+				Usage:    "Type of documents to list",
 				Required: true,
 			},
 			&cli.IntFlag{
@@ -156,11 +139,6 @@ func main() {
 	searchCommand := cli.Command{
 		Name:   "search",
 		Action: queryIndex,
-	}
-
-	loginCommand := cli.Command{
-		Name:   "login",
-		Action: login,
 	}
 
 	setStatusCommand := cli.Command{
@@ -185,6 +163,33 @@ func main() {
 		},
 	}
 
+	runListCommand := cli.Command{
+		Name:      "run-list",
+		Action:    runListAction,
+		Usage:     "run an action on the documents listed in a CSV file",
+		Args:      true,
+		ArgsUsage: "CSV file",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "separator",
+				Aliases: []string{"f"},
+				Value:   ",",
+			},
+			&cli.StringFlag{
+				Name:  "id-field",
+				Value: "_id",
+			},
+			&cli.StringFlag{
+				Name:  "selected-field",
+				Usage: "The name of a boolean field that should be true to include the document for the action",
+			},
+			&cli.BoolFlag{
+				Name:  "unpublish",
+				Usage: "Unpublish the documents",
+			},
+		},
+	}
+
 	app := cli.App{
 		Name:  "elephant",
 		Usage: "The elephant cli tool",
@@ -197,7 +202,10 @@ func main() {
 			&listDocumentsCommand,
 			&searchCommand,
 			&setStatusCommand,
-			&loginCommand,
+			&runListCommand,
+			clitools.ConfigureCliCommands(
+				appName, clitools.DefaultApplicationID,
+			),
 		},
 		Flags: []cli.Flag{
 			&cli.StringFlag{
@@ -231,17 +239,6 @@ func readNewsdoc(fileName string) (*rpc_newsdoc.Document, error) {
 	return &doc, nil
 }
 
-func login(c *cli.Context) error {
-	env := c.String("env")
-
-	_, err := getClients(c.Context, env, true)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 type elephantClients struct {
 	Env       string
 	Documents repository.Documents
@@ -251,33 +248,15 @@ type elephantClients struct {
 func getClients(
 	ctx context.Context,
 	env string,
-	save bool,
 ) (*elephantClients, error) {
-	var oidcURL string
-
-	switch env {
-	case "local", "stage":
-		oidcURL = clitools.StageOIDCServer
-	case "prod":
-		oidcURL = clitools.ProdOIDCServer
-	default:
-		return nil, fmt.Errorf("unknown environment %q", env)
-	}
-
-	oidcConfig, err := clitools.OIDCConfigURL(oidcURL, "elephant")
-	if err != nil {
-		return nil, fmt.Errorf("get OIDC config URL: %w", err)
-	}
-
-	conf, err := clitools.NewConfigurationHandler[struct{}](
-		"baboon-client", clitools.DefaultApplicationID, env,
-		oidcConfig,
+	conf, err := clitools.NewConfigurationHandler(
+		appName, clitools.DefaultApplicationID, env,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("load configuration: %w", err)
 	}
 
-	token, err := conf.GetAccessToken(ctx, env, true, []string{
+	token, err := conf.GetAccessToken(ctx, []string{
 		"baboon", "baboon_admin", "doc_read", "media", "doc_write",
 		"asset_upload", "eventlog_read", "search",
 	})
@@ -285,24 +264,27 @@ func getClients(
 		return nil, fmt.Errorf("get access token: %w", err)
 	}
 
-	if save {
-		err = conf.Save()
-		if err != nil {
-			slog.Warn("failed to save configuration", "err", err)
-		}
+	err = conf.Save()
+	if err != nil {
+		slog.Warn("failed to save configuration", "err", err)
 	}
 
 	client := oauth2.NewClient(ctx, oauth2.StaticTokenSource(&oauth2.Token{
 		AccessToken: token.Token,
 	}))
 
-	endpoint, ok := endpoints[env]
+	repoEndpoint, ok := conf.GetEndpoint("repository")
 	if !ok {
-		return nil, fmt.Errorf("no baboon endpoint for %q", env)
+		return nil, errors.New("no endpoint for repository")
 	}
 
-	documents := repository.NewDocumentsProtobufClient(endpoint.Repository, client)
-	search := index.NewSearchV1ProtobufClient(endpoint.Index, client)
+	indexEndpoint, ok := conf.GetEndpoint("index")
+	if !ok {
+		return nil, errors.New("no endpoint for index")
+	}
+
+	documents := repository.NewDocumentsProtobufClient(repoEndpoint, client)
+	search := index.NewSearchV1ProtobufClient(indexEndpoint, client)
 
 	return &elephantClients{
 		Env:       env,

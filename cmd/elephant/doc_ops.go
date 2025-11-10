@@ -4,12 +4,15 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"encoding/csv"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"slices"
+	"strconv"
 	"strings"
 	"time"
 
@@ -20,6 +23,7 @@ import (
 	"github.com/ttab/elephant-api/repository"
 	"github.com/ttab/elephantine"
 	"github.com/ttab/flerr"
+	"github.com/twitchtv/twirp"
 	"github.com/urfave/cli/v2"
 	"google.golang.org/protobuf/encoding/protojson"
 )
@@ -32,7 +36,7 @@ func uploadDoc(c *cli.Context) error {
 
 	ctx := c.Context
 
-	clients, err := getClients(ctx, env, false)
+	clients, err := getClients(ctx, env)
 	if err != nil {
 		return err
 	}
@@ -83,7 +87,7 @@ func setStatus(c *cli.Context) error {
 
 	ctx := c.Context
 
-	clients, err := getClients(ctx, env, false)
+	clients, err := getClients(ctx, env)
 	if err != nil {
 		return err
 	}
@@ -132,7 +136,7 @@ func queryIndex(c *cli.Context) error {
 
 	ctx := c.Context
 
-	clients, err := getClients(ctx, env, false)
+	clients, err := getClients(ctx, env)
 	if err != nil {
 		return err
 	}
@@ -194,7 +198,7 @@ func listDocuments(c *cli.Context) error {
 
 	ctx := c.Context
 
-	babby, err := getClients(ctx, env, false)
+	babby, err := getClients(ctx, env)
 	if err != nil {
 		return err
 	}
@@ -206,9 +210,13 @@ func listDocuments(c *cli.Context) error {
 			{Field: "_id"},
 		},
 		Fields: []string{
-			"document.title", "document.uri",
+			"document.title", "current_version", "document.uri",
 		},
 	}
+
+	fmt.Println(strings.Join([]string{
+		"uuid", "current_version", "uri", "title",
+	}, "\t"))
 
 	var count int
 
@@ -222,15 +230,15 @@ func listDocuments(c *cli.Context) error {
 			break
 		}
 
-		fmt.Printf("%s\t%s\t%s\n", "uuid", "uri", "title")
-
 		for _, hit := range res.Hits.Hits {
 			count++
 
-			fmt.Printf("%s\t%s\t%s\n",
+			fmt.Println(strings.Join([]string{
 				hit.Id,
+				hit.GetField("current_version"),
 				hit.GetField("document.uri"),
-				hit.GetField("document.title"))
+				hit.GetField("document.title"),
+			}, "\t"))
 
 			q.SearchAfter = hit.Sort
 		}
@@ -253,12 +261,12 @@ func copyDocument(c *cli.Context) (outErr error) {
 
 	ctx := c.Context
 
-	from, err := getClients(ctx, fromEnv, false)
+	from, err := getClients(ctx, fromEnv)
 	if err != nil {
 		return err
 	}
 
-	to, err := getClients(ctx, toEnv, false)
+	to, err := getClients(ctx, toEnv)
 	if err != nil {
 		return err
 	}
@@ -284,12 +292,12 @@ func copyDocuments(c *cli.Context) (outErr error) {
 
 	ctx := c.Context
 
-	from, err := getClients(ctx, fromEnv, false)
+	from, err := getClients(ctx, fromEnv)
 	if err != nil {
 		return err
 	}
 
-	to, err := getClients(ctx, toEnv, false)
+	to, err := getClients(ctx, toEnv)
 	if err != nil {
 		return err
 	}
@@ -544,7 +552,7 @@ func listDocVersions(c *cli.Context) (outErr error) {
 
 	ctx := c.Context
 
-	babby, err := getClients(ctx, env, false)
+	babby, err := getClients(ctx, env)
 	if err != nil {
 		return err
 	}
@@ -643,7 +651,7 @@ func downloadDoc(c *cli.Context) (outErr error) {
 
 	defer clean.FlushTo(&outErr)
 
-	babby, err := getClients(c.Context, env, false)
+	babby, err := getClients(c.Context, env)
 	if err != nil {
 		return err
 	}
@@ -687,4 +695,204 @@ func downloadDoc(c *cli.Context) (outErr error) {
 	}
 
 	return nil
+}
+
+func runListAction(c *cli.Context) (outErr error) {
+	var (
+		env           = c.String("env")
+		sep           = c.String("separator")
+		idField       = c.String("id-field")
+		selectedField = c.String("selected-field")
+		unpublish     = c.Bool("unpublish")
+	)
+
+	ctx := c.Context
+
+	// Only allow one action to avoid any surprises.
+	if !oneTrue(unpublish) {
+		return errors.New("a single action needs to be specified")
+	}
+
+	sepRunes := []rune(sep)
+
+	fmt.Printf("%q %v\n", sep, sepRunes)
+
+	if len(sepRunes) != 1 {
+		return errors.New("separator must be a single character")
+	}
+
+	if len(idField) == 0 {
+		return errors.New("id-field cannot be empty")
+	}
+
+	if !c.Args().Present() {
+		return errors.New("missing CSV file argument")
+	}
+
+	f, err := os.Open(c.Args().First())
+	if err != nil {
+		return fmt.Errorf("open CSV file: %w", err)
+	}
+
+	defer elephantine.Close("CSV file", f, &outErr)
+
+	lines, err := lineCounter(f)
+	if err != nil {
+		return fmt.Errorf("count lines in CSV: %w", err)
+	}
+
+	_, err = f.Seek(0, 0)
+	if err != nil {
+		return fmt.Errorf("seek to beginning of file: %w", err)
+	}
+
+	clients, err := getClients(c.Context, env)
+	if err != nil {
+		return err
+	}
+
+	r := csv.NewReader(f)
+
+	r.Comma = sepRunes[0]
+
+	headerRow, err := r.Read()
+	if err != nil {
+		return fmt.Errorf("read header row: %w", err)
+	}
+
+	idIndex := slices.Index(headerRow, idField)
+	if idIndex == -1 {
+		return fmt.Errorf(
+			"could not find id column %q, is there a header row?",
+			idField)
+	}
+
+	selectedIndex := -1
+
+	if selectedField != "" {
+		idx := slices.Index(headerRow, selectedField)
+		if idx == -1 {
+			return fmt.Errorf("could not find 'selected' field %q",
+				selectedField)
+		}
+
+		selectedIndex = idx
+	}
+
+	line := 1
+
+	bar := progressbar.Default(int64(lines - 1))
+
+	for {
+		line++
+
+		_ = bar.Add(1)
+
+		row, err := r.Read()
+		if errors.Is(err, io.EOF) {
+			break
+		} else if err != nil {
+			return fmt.Errorf("read CSV row %d: %w", line, err)
+		}
+
+		if selectedIndex != -1 {
+			selected, err := strconv.ParseBool(row[selectedIndex])
+			if err != nil {
+				return fmt.Errorf(
+					"invalid selected value for row %d: %w",
+					line, err)
+			}
+
+			if !selected {
+				continue
+			}
+		}
+
+		docID := row[idIndex]
+		if docID == "" {
+			continue
+		}
+
+		switch {
+		case unpublish:
+			err := documentUnpublishAction(ctx, clients, docID)
+			if err != nil {
+				return fmt.Errorf(
+					"unpublish document %s on row %d: %w",
+					docID, line, err)
+			}
+		}
+	}
+
+	return nil
+}
+
+func lineCounter(r io.Reader) (int, error) {
+	buf := make([]byte, 32*1024)
+	count := 0
+	lineSep := []byte{'\n'}
+
+	for {
+		c, err := r.Read(buf)
+		count += bytes.Count(buf[:c], lineSep)
+
+		switch {
+		case err == io.EOF:
+			return count, nil
+		case err != nil:
+			return count, fmt.Errorf("read from file: %w", err)
+		}
+	}
+}
+
+func documentUnpublishAction(
+	ctx context.Context, clients *elephantClients, id string,
+) error {
+	statusRes, err := clients.Documents.GetStatus(ctx,
+		&repository.GetStatusRequest{
+			Uuid: id,
+			Name: "usable",
+		})
+	if elephantine.IsTwirpErrorCode(err, twirp.NotFound) {
+		// Either there's no such document, or it hasn't had any usable
+		// status set. Either way, mission accomplished, no?
+		return nil
+	} else if err != nil {
+		return fmt.Errorf("get current usable status: %w", err)
+	}
+
+	if statusRes.Status.Version == -1 {
+		// Already unpublished.
+		return nil
+	}
+
+	_, err = clients.Documents.Update(ctx, &repository.UpdateRequest{
+		Uuid: id,
+		Status: []*repository.StatusUpdate{
+			{
+				Name:    "usable",
+				Version: -1,
+				IfMatch: statusRes.Status.Id,
+			},
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("set usable to -1: %w", err)
+	}
+
+	return nil
+}
+
+func oneTrue(b ...bool) bool {
+	var v bool
+
+	for i := range b {
+		if v && b[i] {
+			return false
+		}
+
+		v = v || b[i]
+	}
+
+	return v
 }
