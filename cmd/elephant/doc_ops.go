@@ -24,17 +24,15 @@ import (
 	"github.com/ttab/elephantine"
 	"github.com/ttab/flerr"
 	"github.com/twitchtv/twirp"
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
-func uploadDoc(c *cli.Context) error {
+func uploadDoc(ctx context.Context, cmd *cli.Command) error {
 	var (
-		env     = c.String("env")
-		ifMatch = c.Int64("if-match")
+		env     = cmd.String("env")
+		ifMatch = cmd.Int64("if-match")
 	)
-
-	ctx := c.Context
 
 	clients, err := getClients(ctx, env)
 	if err != nil {
@@ -76,16 +74,14 @@ func uploadDoc(c *cli.Context) error {
 	return nil
 }
 
-func setStatus(c *cli.Context) error {
+func setStatus(ctx context.Context, cmd *cli.Command) error {
 	var (
-		env        = c.String("env")
-		docUUID    = c.String("uuid")
-		statusName = c.String("status")
-		version    = c.Int64("version")
-		meta       = c.StringSlice("meta")
+		env        = cmd.String("env")
+		docUUID    = cmd.String("uuid")
+		statusName = cmd.String("status")
+		version    = cmd.Int64("version")
+		meta       = cmd.StringSlice("meta")
 	)
-
-	ctx := c.Context
 
 	clients, err := getClients(ctx, env)
 	if err != nil {
@@ -131,10 +127,8 @@ func setStatus(c *cli.Context) error {
 	return nil
 }
 
-func queryIndex(c *cli.Context) error {
-	env := c.String("env")
-
-	ctx := c.Context
+func queryIndex(ctx context.Context, cmd *cli.Command) error {
+	env := cmd.String("env")
 
 	clients, err := getClients(ctx, env)
 	if err != nil {
@@ -189,14 +183,12 @@ func queryIndex(c *cli.Context) error {
 	return nil
 }
 
-func listDocuments(c *cli.Context) error {
+func listDocuments(ctx context.Context, cmd *cli.Command) error {
 	var (
-		env      = c.String("env")
-		docType  = c.String("doc-type")
-		maxCount = c.Int("max")
+		env      = cmd.String("env")
+		docType  = cmd.String("doc-type")
+		maxCount = cmd.Int("max")
 	)
-
-	ctx := c.Context
 
 	babby, err := getClients(ctx, env)
 	if err != nil {
@@ -251,15 +243,13 @@ func listDocuments(c *cli.Context) error {
 	return nil
 }
 
-func copyDocument(c *cli.Context) (outErr error) {
+func copyDocument(ctx context.Context, cmd *cli.Command) (outErr error) {
 	var (
-		fromEnv    = c.String("env")
-		toEnv      = c.String("to-env")
-		docID      = c.String("uuid")
-		attachment = c.String("attachment")
+		fromEnv    = cmd.String("env")
+		toEnv      = cmd.String("to-env")
+		docID      = cmd.String("uuid")
+		attachment = cmd.String("attachment")
 	)
-
-	ctx := c.Context
 
 	from, err := getClients(ctx, fromEnv)
 	if err != nil {
@@ -281,16 +271,14 @@ func copyDocument(c *cli.Context) (outErr error) {
 	return nil
 }
 
-func copyDocuments(c *cli.Context) (outErr error) {
+func copyDocuments(ctx context.Context, cmd *cli.Command) (outErr error) {
 	var (
-		fromEnv    = c.String("env")
-		toEnv      = c.String("to-env")
-		docType    = c.String("doc-type")
-		skipDocs   = c.Int("skip")
-		attachment = c.String("attachment")
+		fromEnv    = cmd.String("env")
+		toEnv      = cmd.String("to-env")
+		docType    = cmd.String("doc-type")
+		skipDocs   = cmd.Int("skip")
+		attachment = cmd.String("attachment")
 	)
-
-	ctx := c.Context
 
 	from, err := getClients(ctx, fromEnv)
 	if err != nil {
@@ -532,12 +520,12 @@ func askForConfirmation(s string) bool {
 	}
 }
 
-func listDocVersions(c *cli.Context) (outErr error) {
+func listDocVersions(ctx context.Context, cmd *cli.Command) (outErr error) {
 	var (
-		env     = c.String("env")
-		docUUID = c.Path("uuid")
-		uri     = c.String("uri")
-		before  = c.Int64("before")
+		env     = cmd.String("env")
+		docUUID = cmd.String("uuid")
+		uri     = cmd.String("uri")
+		before  = cmd.Int64("before")
 	)
 
 	if docUUID == "" && uri == "" {
@@ -549,8 +537,6 @@ func listDocVersions(c *cli.Context) (outErr error) {
 
 		docUUID = cu.String()
 	}
-
-	ctx := c.Context
 
 	babby, err := getClients(ctx, env)
 	if err != nil {
@@ -628,13 +614,13 @@ func resolveUser(
 	return hits.Hits.Hits[0].GetField("document.title")
 }
 
-func downloadDoc(c *cli.Context) (outErr error) {
+func downloadDoc(ctx context.Context, cmd *cli.Command) (outErr error) {
 	var (
-		env     = c.String("env")
-		docUUID = c.Path("uuid")
-		out     = c.Path("out")
-		uri     = c.String("uri")
-		version = c.Int64("version")
+		env     = cmd.String("env")
+		docUUID = cmd.String("uuid")
+		out     = cmd.String("out")
+		uri     = cmd.String("uri")
+		version = cmd.Int64("version")
 	)
 
 	if docUUID == "" && uri == "" {
@@ -651,12 +637,12 @@ func downloadDoc(c *cli.Context) (outErr error) {
 
 	defer clean.FlushTo(&outErr)
 
-	babby, err := getClients(c.Context, env)
+	babby, err := getClients(ctx, env)
 	if err != nil {
 		return err
 	}
 
-	ctx, cancel := context.WithTimeout(c.Context, 5*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
 	docRes, err := babby.Documents.Get(ctx, &repository.GetDocumentRequest{
@@ -697,16 +683,14 @@ func downloadDoc(c *cli.Context) (outErr error) {
 	return nil
 }
 
-func runListAction(c *cli.Context) (outErr error) {
+func runListAction(ctx context.Context, cmd *cli.Command) (outErr error) {
 	var (
-		env           = c.String("env")
-		sep           = c.String("separator")
-		idField       = c.String("id-field")
-		selectedField = c.String("selected-field")
-		unpublish     = c.Bool("unpublish")
+		env           = cmd.String("env")
+		sep           = cmd.String("separator")
+		idField       = cmd.String("id-field")
+		selectedField = cmd.String("selected-field")
+		unpublish     = cmd.Bool("unpublish")
 	)
-
-	ctx := c.Context
 
 	// Only allow one action to avoid any surprises.
 	if !oneTrue(unpublish) {
@@ -725,11 +709,11 @@ func runListAction(c *cli.Context) (outErr error) {
 		return errors.New("id-field cannot be empty")
 	}
 
-	if !c.Args().Present() {
+	if !cmd.Args().Present() {
 		return errors.New("missing CSV file argument")
 	}
 
-	f, err := os.Open(c.Args().First())
+	f, err := os.Open(cmd.Args().First())
 	if err != nil {
 		return fmt.Errorf("open CSV file: %w", err)
 	}
@@ -746,7 +730,7 @@ func runListAction(c *cli.Context) (outErr error) {
 		return fmt.Errorf("seek to beginning of file: %w", err)
 	}
 
-	clients, err := getClients(c.Context, env)
+	clients, err := getClients(ctx, env)
 	if err != nil {
 		return err
 	}

@@ -9,11 +9,9 @@ import (
 
 	"github.com/ttab/clitools"
 	"github.com/ttab/elephant-api/index"
-	rpc_newsdoc "github.com/ttab/elephant-api/newsdoc"
 	"github.com/ttab/elephant-api/repository"
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 	"golang.org/x/oauth2"
-	"google.golang.org/protobuf/encoding/protojson"
 )
 
 const appName = "elephant-cli"
@@ -53,9 +51,10 @@ func main() {
 				Name:  "uri",
 				Usage: "URI of document to download",
 			},
-			&cli.PathFlag{
-				Name:  "out",
-				Usage: "File to write to, optional",
+			&cli.StringFlag{
+				Name:      "out",
+				Usage:     "File to write to, optional",
+				TakesFile: true,
 			},
 			&cli.Int64Flag{
 				Name:  "version",
@@ -167,7 +166,6 @@ func main() {
 		Name:      "run-list",
 		Action:    runListAction,
 		Usage:     "run an action on the documents listed in a CSV file",
-		Args:      true,
 		ArgsUsage: "CSV file",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
@@ -190,7 +188,7 @@ func main() {
 		},
 	}
 
-	app := cli.App{
+	app := cli.Command{
 		Name:  "elephant",
 		Usage: "The elephant cli tool",
 		Commands: []*cli.Command{
@@ -211,32 +209,16 @@ func main() {
 			&cli.StringFlag{
 				Name:    "env",
 				Usage:   "Environment (local/stage/prod)",
-				EnvVars: []string{"ENV"},
+				Sources: cli.EnvVars("ENV"),
 				Value:   "stage",
 			},
 		},
 	}
 
-	if err := app.Run(os.Args); err != nil {
+	if err := app.Run(context.Background(), os.Args); err != nil {
 		println("error: ", err.Error())
 		os.Exit(1)
 	}
-}
-
-func readNewsdoc(fileName string) (*rpc_newsdoc.Document, error) {
-	var doc rpc_newsdoc.Document
-
-	data, err := os.ReadFile(fileName)
-	if err != nil {
-		return nil, fmt.Errorf("read file: %w", err)
-	}
-
-	err = protojson.Unmarshal(data, &doc)
-	if err != nil {
-		return nil, fmt.Errorf("parse file: %w", err)
-	}
-
-	return &doc, nil
 }
 
 type elephantClients struct {
