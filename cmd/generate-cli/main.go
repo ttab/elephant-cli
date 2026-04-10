@@ -88,6 +88,8 @@ type methodTmplData struct {
 	OutputType   string
 	AllFlaggable bool
 	Fields       []fieldTmplData
+	ReqSchema    string // pretty-printed JSON Schema
+	ResSchema    string // pretty-printed JSON Schema
 }
 
 type fieldTmplData struct {
@@ -106,6 +108,9 @@ type commandsTmplData struct {
 func main() {
 	tmpl, err := template.New("").Funcs(template.FuncMap{
 		"join": strings.Join,
+		"backtickLit": func(s string) string {
+			return "`" + s + "`"
+		},
 	}).ParseFS(templateFS, "templates/*.tmpl")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "parse templates: %v\n", err)
@@ -231,6 +236,8 @@ func processMethod(cfg serviceConfig, sd protoreflect.ServiceDescriptor, md prot
 	}
 
 	m.AllFlaggable = allFlaggable
+	m.ReqSchema = buildSchemaJSON(inputDesc, comments)
+	m.ResSchema = buildSchemaJSON(outputDesc, comments)
 
 	return m
 }
@@ -455,6 +462,132 @@ func unexport(s string) string {
 	}
 
 	return strings.ToLower(s[:1]) + s[1:]
+}
+
+// --- JSON Schema generation ---
+
+// buildSchemaJSON generates a JSON Schema for a protobuf message descriptor,
+// using protojson field naming conventions and proto comments as descriptions.
+func buildSchemaJSON(md protoreflect.MessageDescriptor, comments commentMap) string {
+	schema := buildMessageSchema(md, comments, 0)
+
+	data, err := json.MarshalIndent(schema, "", "  ")
+	if err != nil {
+		return `{"type":"object"}`
+	}
+
+	// Replace backticks so the JSON can be embedded in a Go raw string literal.
+	return strings.ReplaceAll(string(data), "`", "'")
+}
+
+func buildMessageSchema(md protoreflect.MessageDescriptor, comments commentMap, depth int) map[string]any {
+	schema := orderedMap(
+		"type", "object",
+	)
+
+	msgName := string(md.Name())
+	if desc := comments.get(msgName); desc != "" {
+		schema["description"] = desc
+	}
+
+	if depth > 4 {
+		return schema
+	}
+
+	fields := md.Fields()
+	if fields.Len() == 0 {
+		return schema
+	}
+
+	props := make(map[string]any, fields.Len())
+
+	for i := range fields.Len() {
+		fd := fields.Get(i)
+		jsonName := fd.JSONName()
+		fs := buildFieldSchema(fd, comments, depth)
+
+		// Add description from proto comment.
+		parentName := string(fd.Parent().Name())
+		protoName := string(fd.Name())
+
+		if desc := comments.get(parentName + "." + protoName); desc != "" {
+			fs["description"] = desc
+		}
+
+		props[jsonName] = fs
+	}
+
+	schema["properties"] = props
+
+	return schema
+}
+
+func buildFieldSchema(fd protoreflect.FieldDescriptor, comments commentMap, depth int) map[string]any {
+	if fd.IsMap() {
+		valSchema := buildScalarOrMsgSchema(fd.MapValue(), comments, depth)
+
+		return orderedMap(
+			"type", "object",
+			"additionalProperties", valSchema,
+		)
+	}
+
+	base := buildScalarOrMsgSchema(fd, comments, depth)
+
+	if fd.IsList() {
+		return orderedMap(
+			"type", "array",
+			"items", base,
+		)
+	}
+
+	return base
+}
+
+func buildScalarOrMsgSchema(fd protoreflect.FieldDescriptor, comments commentMap, depth int) map[string]any {
+	switch fd.Kind() {
+	case protoreflect.StringKind:
+		return orderedMap("type", "string")
+	case protoreflect.Int32Kind, protoreflect.Sint32Kind, protoreflect.Sfixed32Kind,
+		protoreflect.Uint32Kind, protoreflect.Fixed32Kind:
+		return orderedMap("type", "integer")
+	case protoreflect.Int64Kind, protoreflect.Sint64Kind, protoreflect.Sfixed64Kind:
+		return orderedMap("type", "string", "format", "int64")
+	case protoreflect.Uint64Kind, protoreflect.Fixed64Kind:
+		return orderedMap("type", "string", "format", "uint64")
+	case protoreflect.BoolKind:
+		return orderedMap("type", "boolean")
+	case protoreflect.FloatKind, protoreflect.DoubleKind:
+		return orderedMap("type", "number")
+	case protoreflect.BytesKind:
+		return orderedMap("type", "string", "format", "byte")
+	case protoreflect.EnumKind:
+		values := enumValueNames(fd.Enum())
+		anyVals := make([]any, len(values))
+
+		for i, v := range values {
+			anyVals[i] = v
+		}
+
+		return map[string]any{"type": "string", "enum": anyVals}
+	case protoreflect.MessageKind, protoreflect.GroupKind:
+		return buildMessageSchema(fd.Message(), comments, depth+1)
+	default:
+		return orderedMap("type", "string")
+	}
+}
+
+// orderedMap creates a map from alternating key/value pairs. The resulting map
+// doesn't preserve insertion order (Go maps don't), but json.Marshal sorts keys
+// alphabetically which is acceptable for schemas.
+func orderedMap(kvs ...any) map[string]any {
+	m := make(map[string]any, len(kvs)/2)
+
+	for i := 0; i < len(kvs)-1; i += 2 {
+		m[kvs[i].(string)] = kvs[i+1]
+	}
+
+	return m
 }
 
 // --- Proto comment parsing ---

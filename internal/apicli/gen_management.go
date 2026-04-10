@@ -31,8 +31,58 @@ func managementRegisterClusterCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "register-cluster",
 		Usage: "RegisterCluster for use with index sets.",
-		Flags: fileFlag(),
+		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "auth": {
+      "description": "Auth is used to specify the authentication method.",
+      "properties": {
+        "caCert": {
+          "description": "CACert can be set to provide a PEM encoded CA certificate to trust.",
+          "type": "string"
+        },
+        "iam": {
+          "description": "IAM authentication.",
+          "type": "boolean"
+        },
+        "insecureTls": {
+          "description": "InsecureTLS sets insecure skip verify for the cluster client, optional.",
+          "type": "boolean"
+        },
+        "password": {
+          "description": "Password.",
+          "type": "string"
+        },
+        "username": {
+          "description": "Username.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "endpoint": {
+      "description": "Endpoint for the cluster.",
+      "type": "string"
+    },
+    "name": {
+      "description": "Name used to identify the cluster.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "index")
 			if err != nil {
 				return err
@@ -60,8 +110,59 @@ func managementListClustersCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "list-clusters",
 		Usage: "ListClusters returns a list of clusters together with information about the number of index sets they contain.",
-		Flags: append([]cli.Flag{}, fileFlag()...),
+		Flags: append([]cli.Flag{}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "clusters": {
+      "items": {
+        "properties": {
+          "auth": {
+            "description": "Auth options for the cluster.",
+            "properties": {
+              "iam": {
+                "description": "IAM authentication.",
+                "type": "boolean"
+              },
+              "username": {
+                "description": "Username.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "endpoint": {
+            "description": "Endpoint for the cluster.",
+            "type": "string"
+          },
+          "indexSetCount": {
+            "description": "Number of index sets in the cluster.",
+            "format": "int64",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name used to identify the cluster.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "index")
 			if err != nil {
 				return err
@@ -91,8 +192,28 @@ func managementDeleteClusterCommand() *cli.Command {
 		Usage: "DeleteCluster deletes a registered cluster. A cluster cannot be deleted as long as it has associated index sets.",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "name", Usage: "Name of the cluster to delete."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "name": {
+      "description": "Name of the cluster to delete.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "index")
 			if err != nil {
 				return err
@@ -125,8 +246,28 @@ func managementDeleteIndexSetCommand() *cli.Command {
 		Usage: "DeleteIndexSet deletes an index set. The set cannot be active or enabled.",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "name", Usage: "Name of the index set to delete."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "name": {
+      "description": "Name of the index set to delete.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "index")
 			if err != nil {
 				return err
@@ -159,8 +300,34 @@ func managementReindexCommand() *cli.Command {
 		Usage: "Reindex set creates a new index set in the specified cluster and starts indexing documents to it.",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "cluster", Usage: "Cluster that we should re-index set to."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "cluster": {
+      "description": "Cluster that we should re-index set to.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "name": {
+      "description": "Name of the new index set.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "index")
 			if err != nil {
 				return err
@@ -194,8 +361,33 @@ func managementPartialReindexCommand() *cli.Command {
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "index-set", Usage: "IndexSet to re-index."},
 			&cli.Int64Flag{Name: "position", Usage: "Position to start from."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "indexSet": {
+      "description": "IndexSet to re-index.",
+      "type": "string"
+    },
+    "position": {
+      "description": "Position to start from.",
+      "format": "int64",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "index")
 			if err != nil {
 				return err
@@ -232,8 +424,81 @@ func managementListIndexSetsCommand() *cli.Command {
 			&cli.BoolFlag{Name: "only-active", Usage: "OnlyActive only returns the currently active index set."},
 			&cli.StringFlag{Name: "status", Usage: "Status can be used to filter index sets by their enabled/disabled status. (values: STATUS_UNSPECIFIED, STATUS_ENABLED, STATUS_DISABLED)"},
 			&cli.StringFlag{Name: "cursor", Usage: "Cursor to the page that should be returned. Omit to get the first page."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "cluster": {
+      "description": "Cluster can be used to filter by cluster.",
+      "type": "string"
+    },
+    "cursor": {
+      "description": "Cursor to the page that should be returned. Omit to get the first page.",
+      "type": "string"
+    },
+    "onlyActive": {
+      "description": "OnlyActive only returns the currently active index set.",
+      "type": "boolean"
+    },
+    "status": {
+      "description": "Status can be used to filter index sets by their enabled/disabled status.",
+      "enum": [
+        "STATUS_UNSPECIFIED",
+        "STATUS_ENABLED",
+        "STATUS_DISABLED"
+      ],
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "indexSets": {
+      "description": "IndexSets that matched the criteria.",
+      "items": {
+        "properties": {
+          "active": {
+            "description": "Active status of the index set.",
+            "type": "boolean"
+          },
+          "cluster": {
+            "description": "Cluster that the index set has been created in.",
+            "type": "string"
+          },
+          "enabled": {
+            "description": "Enabled status of the index set.",
+            "type": "boolean"
+          },
+          "name": {
+            "description": "Name of the index set.",
+            "type": "string"
+          },
+          "position": {
+            "description": "Position in the repository content log.",
+            "format": "int64",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "nextPage": {
+      "description": "NextPage cursor to use to get the next page of index sets. Empty if no more index sets exist.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "index")
 			if err != nil {
 				return err
@@ -279,8 +544,40 @@ func managementSetIndexSetStatusCommand() *cli.Command {
 			&cli.BoolFlag{Name: "active", Usage: "Active means that search requests are being routed to this index set. There is always exactly one active index set at a time. Setting an index set to active will deactivate but not disable the currently active index set."},
 			&cli.BoolFlag{Name: "force-active", Usage: "ForceActive is used to force the activation of an index set that lags more than 10 events behind the currently active set."},
 			&cli.BoolFlag{Name: "enabled", Usage: "Enabled means that documents should index to the index set. Disabling an index set will only pause index seting, and it can later be resumed. Disabling an index set does not deactivate it."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "active": {
+      "description": "Active means that search requests are being routed to this index set. There is always exactly one active index set at a time. Setting an index set to active will deactivate but not disable the currently active index set.",
+      "type": "boolean"
+    },
+    "enabled": {
+      "description": "Enabled means that documents should index to the index set. Disabling an index set will only pause index seting, and it can later be resumed. Disabling an index set does not deactivate it.",
+      "type": "boolean"
+    },
+    "forceActive": {
+      "description": "ForceActive is used to force the activation of an index set that lags more than 10 events behind the currently active set.",
+      "type": "boolean"
+    },
+    "name": {
+      "description": "Name of the index set to set the status of.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "index")
 			if err != nil {
 				return err

@@ -31,8 +31,35 @@ func metricsRegisterKindCommand() *cli.Command {
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "name"},
 			&cli.StringFlag{Name: "aggregation", Usage: "values: NONE, REPLACE, INCREMENT"},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "aggregation": {
+      "enum": [
+        "NONE",
+        "REPLACE",
+        "INCREMENT"
+      ],
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -73,8 +100,27 @@ func metricsDeleteKindCommand() *cli.Command {
 		Usage: "Delete a metric kind",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "name"},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "name": {
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -105,8 +151,43 @@ func metricsGetKindsCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-kinds",
 		Usage: "List all metric kinds",
-		Flags: append([]cli.Flag{}, fileFlag()...),
+		Flags: append([]cli.Flag{}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "kinds": {
+      "items": {
+        "properties": {
+          "aggregation": {
+            "enum": [
+              "NONE",
+              "REPLACE",
+              "INCREMENT"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -139,8 +220,37 @@ func metricsRegisterMetricCommand() *cli.Command {
 			&cli.StringFlag{Name: "kind"},
 			&cli.StringFlag{Name: "label"},
 			&cli.Int64Flag{Name: "value"},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "kind": {
+      "type": "string"
+    },
+    "label": {
+      "type": "string"
+    },
+    "uuid": {
+      "type": "string"
+    },
+    "value": {
+      "format": "int64",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -177,8 +287,69 @@ func metricsGetMetricsCommand() *cli.Command {
 		Flags: append([]cli.Flag{
 			&cli.StringSliceFlag{Name: "uuids", Usage: "The documents to get metrics for."},
 			&cli.StringSliceFlag{Name: "kinds", Usage: "The metric kinds to get. Optional, defaults to all."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "kinds": {
+      "description": "The metric kinds to get. Optional, defaults to all.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "uuids": {
+      "description": "The documents to get metrics for.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "documents": {
+      "additionalProperties": {
+        "properties": {
+          "metrics": {
+            "items": {
+              "properties": {
+                "kind": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "value": {
+                  "format": "int64",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "uuid": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err

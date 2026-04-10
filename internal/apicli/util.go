@@ -156,13 +156,21 @@ func writeResponse(cmd *cli.Command, msg proto.Message) error {
 	return nil
 }
 
-// fileFlag returns the common --file/-f flag used by all generated commands.
-func fileFlag() []cli.Flag {
+// methodFlags returns the common flags used by all generated method commands.
+func methodFlags() []cli.Flag {
 	return []cli.Flag{
 		&cli.StringFlag{
 			Name:    "file",
 			Aliases: []string{"f"},
 			Usage:   "Read request from JSON/toon file (use '-' for stdin)",
+		},
+		&cli.BoolFlag{
+			Name:  "req-schema",
+			Usage: "Print JSON Schema for the request message and exit",
+		},
+		&cli.BoolFlag{
+			Name:  "res-schema",
+			Usage: "Print JSON Schema for the response message and exit",
 		},
 	}
 }

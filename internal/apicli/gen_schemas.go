@@ -36,8 +36,51 @@ func schemasRegisterCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "register",
 		Usage: "Register register a new validation schema version.",
-		Flags: fileFlag(),
+		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "activate": {
+      "description": "Activate the registered schema immediately.",
+      "type": "boolean"
+    },
+    "schema": {
+      "description": "Schema to register. The spec can be omitted if a schema URL is passed.",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "spec": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "schemaSha256": {
+      "description": "SchemaSHA256 is a SHA256 checksum to validate the response body from the schema URL against.",
+      "type": "string"
+    },
+    "schemaUrl": {
+      "description": "SchemaURL is an HTTP(S) url to the schema to load, can be passed instead of an inline schema spec.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -69,8 +112,36 @@ func schemasSetActiveCommand() *cli.Command {
 			&cli.StringFlag{Name: "name", Usage: "Name is the name of the schema to activate or deactivate, required."},
 			&cli.StringFlag{Name: "version", Usage: "Version of the schema to activate, required when activating a new version."},
 			&cli.BoolFlag{Name: "deactivate", Usage: "Deactivate is used to disable a schema, activate new schema versions instead if you want to start using a new version."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "deactivate": {
+      "description": "Deactivate is used to disable a schema, activate new schema versions instead if you want to start using a new version.",
+      "type": "boolean"
+    },
+    "name": {
+      "description": "Name is the name of the schema to activate or deactivate, required.",
+      "type": "string"
+    },
+    "version": {
+      "description": "Version of the schema to activate, required when activating a new version.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -106,8 +177,41 @@ func schemasGetCommand() *cli.Command {
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "name", Usage: "Name of the schema to get."},
 			&cli.StringFlag{Name: "version", Usage: "Version of the schema to get, optional. The currently active version of the schema will be returned if no version is specified."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "name": {
+      "description": "Name of the schema to get.",
+      "type": "string"
+    },
+    "version": {
+      "description": "Version of the schema to get, optional. The currently active version of the schema will be returned if no version is specified.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "spec": {
+      "format": "byte",
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -143,8 +247,71 @@ func schemasGetAllActiveCommand() *cli.Command {
 			&cli.Int64Flag{Name: "wait-seconds", Usage: "WaitSeconds is the maximum number of seconds to wait for changes, defaults to 10 seconds. Optional."},
 			&cli.StringMapFlag{Name: "known", Usage: "Known schema versions that the client already has. Optional."},
 			&cli.BoolFlag{Name: "only-changed", Usage: "OnlyChanged only returns the schemas that have been changed."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "known": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Known schema versions that the client already has. Optional.",
+      "type": "object"
+    },
+    "onlyChanged": {
+      "description": "OnlyChanged only returns the schemas that have been changed.",
+      "type": "boolean"
+    },
+    "waitSeconds": {
+      "description": "WaitSeconds is the maximum number of seconds to wait for changes, defaults to 10 seconds. Optional.",
+      "format": "int64",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "removed": {
+      "description": "Removed schemas.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "schemas": {
+      "description": "Schemas that currently are active.",
+      "items": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "spec": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "unchanged": {
+      "description": "Unchanged is set to true if no changes were done compared to known schema versions.",
+      "type": "boolean"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -179,8 +346,42 @@ func schemasListActiveCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "list-active",
 		Usage: "ListActiveSchemas lists the currently active schemas.",
-		Flags: append([]cli.Flag{}, fileFlag()...),
+		Flags: append([]cli.Flag{}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "schemas": {
+      "description": "Schemas without the spec populated",
+      "items": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "spec": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -211,8 +412,32 @@ func schemasRegisterMetaTypeCommand() *cli.Command {
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "type", Usage: "Type to use as a meta type."},
 			&cli.BoolFlag{Name: "exclusive", Usage: "Exclusive - set to true to only allow the type to be used as a meta type."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "exclusive": {
+      "description": "Exclusive - set to true to only allow the type to be used as a meta type.",
+      "type": "boolean"
+    },
+    "type": {
+      "description": "Type to use as a meta type.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -247,8 +472,32 @@ func schemasRegisterMetaTypeUseCommand() *cli.Command {
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "main-type", Usage: "MainType to use the meta type for."},
 			&cli.StringFlag{Name: "meta-type", Usage: "MetaType to use for the main document."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "mainType": {
+      "description": "MainType to use the meta type for.",
+      "type": "string"
+    },
+    "metaType": {
+      "description": "MetaType to use for the main document.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -280,8 +529,38 @@ func schemasGetDeprecationsCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-deprecations",
 		Usage: "GetDeprecations lists all deprecations.",
-		Flags: append([]cli.Flag{}, fileFlag()...),
+		Flags: append([]cli.Flag{}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "deprecations": {
+      "items": {
+        "properties": {
+          "enforced": {
+            "type": "boolean"
+          },
+          "label": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -309,8 +588,35 @@ func schemasUpdateDeprecationCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "update-deprecation",
 		Usage: "UpdateDeprecation creates or updates a deprecation.",
-		Flags: fileFlag(),
+		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "deprecation": {
+      "properties": {
+        "enforced": {
+          "type": "boolean"
+        },
+        "label": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -338,8 +644,41 @@ func schemasGetMetaTypesCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-meta-types",
 		Usage: "GetMetaTypes lists the registered meta types.",
-		Flags: append([]cli.Flag{}, fileFlag()...),
+		Flags: append([]cli.Flag{}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "types": {
+      "items": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "usedBy": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -367,8 +706,31 @@ func schemasGetDocumentTypesCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-document-types",
 		Usage: "GetDocumentTypes lists the defined document types.",
-		Flags: append([]cli.Flag{}, fileFlag()...),
+		Flags: append([]cli.Flag{}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "types": {
+      "description": "Types that have been defined in the schema.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -396,8 +758,88 @@ func schemasConfigureTypeCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "configure-type",
 		Usage: "ConfigureType configures a document type.",
-		Flags: fileFlag(),
+		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "configuration": {
+      "description": "Configuration for the type.",
+      "properties": {
+        "boundedCollection": {
+          "description": "Set to true if this is a collection of documents that are bounded (limited in size). Bounded collections can be fetched by type and language in one go.",
+          "type": "boolean"
+        },
+        "evictNoncurrentAfter": {
+          "description": "EvictNonCurrentAfter can be set to evict non-current versions of a document from the database after they're older than the given number of days. Optional.",
+          "format": "int64",
+          "type": "string"
+        },
+        "labelExpressions": {
+          "description": "LabelExpressions are used to extract labels from documents.",
+          "items": {
+            "properties": {
+              "expression": {
+                "description": "Expression is a newsdoc value extraction expression.",
+                "type": "string"
+              },
+              "template": {
+                "description": "Template is the template that turns the extracted values into a label.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "timeExpressions": {
+          "description": "TimeExpressions are used for extracting time ranges from documents.",
+          "items": {
+            "properties": {
+              "expression": {
+                "description": "Expression is a newsdoc value extraction expression.",
+                "type": "string"
+              },
+              "layout": {
+                "description": "Layout is the time/date format to use when parsing. Optional, defaults to RFC3339 or ISO 8601 for values annotated as dates.",
+                "type": "string"
+              },
+              "timezone": {
+                "description": "Timezone is the timezone the time should be parsed in. Optional, most timestamps should include timezone information, if they don't, parsing will fall back to the default timezone that the repository has been configured with.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "variants": {
+          "description": "Variants are the allowed variants for the document type.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "type": {
+      "description": "Type to configure.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -427,8 +869,90 @@ func schemasGetTypeConfigurationCommand() *cli.Command {
 		Usage: "GetTypeConfiguration returns the current configuration for a type.",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "type", Usage: "Type to get configuration for."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "type": {
+      "description": "Type to get configuration for.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "configuration": {
+      "description": "Configuration of the type.",
+      "properties": {
+        "boundedCollection": {
+          "description": "Set to true if this is a collection of documents that are bounded (limited in size). Bounded collections can be fetched by type and language in one go.",
+          "type": "boolean"
+        },
+        "evictNoncurrentAfter": {
+          "description": "EvictNonCurrentAfter can be set to evict non-current versions of a document from the database after they're older than the given number of days. Optional.",
+          "format": "int64",
+          "type": "string"
+        },
+        "labelExpressions": {
+          "description": "LabelExpressions are used to extract labels from documents.",
+          "items": {
+            "properties": {
+              "expression": {
+                "description": "Expression is a newsdoc value extraction expression.",
+                "type": "string"
+              },
+              "template": {
+                "description": "Template is the template that turns the extracted values into a label.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "timeExpressions": {
+          "description": "TimeExpressions are used for extracting time ranges from documents.",
+          "items": {
+            "properties": {
+              "expression": {
+                "description": "Expression is a newsdoc value extraction expression.",
+                "type": "string"
+              },
+              "layout": {
+                "description": "Layout is the time/date format to use when parsing. Optional, defaults to RFC3339 or ISO 8601 for values annotated as dates.",
+                "type": "string"
+              },
+              "timezone": {
+                "description": "Timezone is the timezone the time should be parsed in. Optional, most timestamps should include timezone information, if they don't, parsing will fall back to the default timezone that the repository has been configured with.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "variants": {
+          "description": "Variants are the allowed variants for the document type.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err

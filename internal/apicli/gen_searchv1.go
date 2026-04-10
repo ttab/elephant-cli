@@ -28,8 +28,1316 @@ func searchV1QueryCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "query",
 		Usage: "Call SearchV1.Query",
-		Flags: fileFlag(),
+		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "documentType": {
+      "type": "string"
+    },
+    "fields": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "from": {
+      "format": "int64",
+      "type": "string"
+    },
+    "language": {
+      "type": "string"
+    },
+    "loadDocument": {
+      "description": "LoadDocument will load the current version of the document from the repository and include it with the search response.",
+      "type": "boolean"
+    },
+    "query": {
+      "properties": {
+        "bool": {
+          "properties": {
+            "filter": {
+              "items": {
+                "properties": {
+                  "bool": {
+                    "properties": {
+                      "filter": {
+                        "items": {
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "minimumShouldMatch": {
+                        "format": "int64",
+                        "type": "string"
+                      },
+                      "must": {
+                        "items": {
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "mustNot": {
+                        "items": {
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "should": {
+                        "items": {
+                          "type": "object"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "exists": {
+                    "type": "string"
+                  },
+                  "match": {
+                    "properties": {
+                      "boost": {
+                        "type": "number"
+                      },
+                      "field": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "matchAll": {
+                    "type": "object"
+                  },
+                  "matchPhrase": {
+                    "properties": {
+                      "field": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "multiMatch": {
+                    "properties": {
+                      "booleanAnd": {
+                        "description": "BooleanAnd can be used to require all terms to match.",
+                        "type": "boolean"
+                      },
+                      "boost": {
+                        "type": "number"
+                      },
+                      "fields": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "fuzziness": {
+                        "description": "Fuzziness is the maximum edit distance allowed for matching.",
+                        "type": "object"
+                      },
+                      "minimumShouldMatch": {
+                        "description": "MinimumShouldMatch if the query string contains multiple search terms and you use the or operator, the number of terms that need to match for the document to be considered a match. See https://opensearch.org/docs/latest/query-dsl/minimum-should-match/",
+                        "type": "string"
+                      },
+                      "prefixLength": {
+                        "description": "PrefixLength is the number of beginning characters left unchanged for fuzzy matching. Optional, defaults to 0.",
+                        "format": "int64",
+                        "type": "string"
+                      },
+                      "query": {
+                        "type": "string"
+                      },
+                      "tieBreaker": {
+                        "type": "number"
+                      },
+                      "type": {
+                        "description": "Type is the multi-match query type. Valid values are best_fields, most_fields, cross_fields, phrase, phrase_prefix, bool_prefix. Default is best_fields.",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "prefix": {
+                    "properties": {
+                      "boost": {
+                        "type": "number"
+                      },
+                      "caseInsensitive": {
+                        "type": "boolean"
+                      },
+                      "field": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "queryString": {
+                    "type": "string"
+                  },
+                  "range": {
+                    "properties": {
+                      "field": {
+                        "type": "string"
+                      },
+                      "gt": {
+                        "type": "string"
+                      },
+                      "gte": {
+                        "type": "string"
+                      },
+                      "lt": {
+                        "type": "string"
+                      },
+                      "lte": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "term": {
+                    "properties": {
+                      "boost": {
+                        "type": "number"
+                      },
+                      "field": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "terms": {
+                    "properties": {
+                      "boost": {
+                        "type": "number"
+                      },
+                      "field": {
+                        "type": "string"
+                      },
+                      "values": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "minimumShouldMatch": {
+              "format": "int64",
+              "type": "string"
+            },
+            "must": {
+              "items": {
+                "properties": {
+                  "bool": {
+                    "properties": {
+                      "filter": {
+                        "items": {
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "minimumShouldMatch": {
+                        "format": "int64",
+                        "type": "string"
+                      },
+                      "must": {
+                        "items": {
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "mustNot": {
+                        "items": {
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "should": {
+                        "items": {
+                          "type": "object"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "exists": {
+                    "type": "string"
+                  },
+                  "match": {
+                    "properties": {
+                      "boost": {
+                        "type": "number"
+                      },
+                      "field": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "matchAll": {
+                    "type": "object"
+                  },
+                  "matchPhrase": {
+                    "properties": {
+                      "field": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "multiMatch": {
+                    "properties": {
+                      "booleanAnd": {
+                        "description": "BooleanAnd can be used to require all terms to match.",
+                        "type": "boolean"
+                      },
+                      "boost": {
+                        "type": "number"
+                      },
+                      "fields": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "fuzziness": {
+                        "description": "Fuzziness is the maximum edit distance allowed for matching.",
+                        "type": "object"
+                      },
+                      "minimumShouldMatch": {
+                        "description": "MinimumShouldMatch if the query string contains multiple search terms and you use the or operator, the number of terms that need to match for the document to be considered a match. See https://opensearch.org/docs/latest/query-dsl/minimum-should-match/",
+                        "type": "string"
+                      },
+                      "prefixLength": {
+                        "description": "PrefixLength is the number of beginning characters left unchanged for fuzzy matching. Optional, defaults to 0.",
+                        "format": "int64",
+                        "type": "string"
+                      },
+                      "query": {
+                        "type": "string"
+                      },
+                      "tieBreaker": {
+                        "type": "number"
+                      },
+                      "type": {
+                        "description": "Type is the multi-match query type. Valid values are best_fields, most_fields, cross_fields, phrase, phrase_prefix, bool_prefix. Default is best_fields.",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "prefix": {
+                    "properties": {
+                      "boost": {
+                        "type": "number"
+                      },
+                      "caseInsensitive": {
+                        "type": "boolean"
+                      },
+                      "field": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "queryString": {
+                    "type": "string"
+                  },
+                  "range": {
+                    "properties": {
+                      "field": {
+                        "type": "string"
+                      },
+                      "gt": {
+                        "type": "string"
+                      },
+                      "gte": {
+                        "type": "string"
+                      },
+                      "lt": {
+                        "type": "string"
+                      },
+                      "lte": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "term": {
+                    "properties": {
+                      "boost": {
+                        "type": "number"
+                      },
+                      "field": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "terms": {
+                    "properties": {
+                      "boost": {
+                        "type": "number"
+                      },
+                      "field": {
+                        "type": "string"
+                      },
+                      "values": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "mustNot": {
+              "items": {
+                "properties": {
+                  "bool": {
+                    "properties": {
+                      "filter": {
+                        "items": {
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "minimumShouldMatch": {
+                        "format": "int64",
+                        "type": "string"
+                      },
+                      "must": {
+                        "items": {
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "mustNot": {
+                        "items": {
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "should": {
+                        "items": {
+                          "type": "object"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "exists": {
+                    "type": "string"
+                  },
+                  "match": {
+                    "properties": {
+                      "boost": {
+                        "type": "number"
+                      },
+                      "field": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "matchAll": {
+                    "type": "object"
+                  },
+                  "matchPhrase": {
+                    "properties": {
+                      "field": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "multiMatch": {
+                    "properties": {
+                      "booleanAnd": {
+                        "description": "BooleanAnd can be used to require all terms to match.",
+                        "type": "boolean"
+                      },
+                      "boost": {
+                        "type": "number"
+                      },
+                      "fields": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "fuzziness": {
+                        "description": "Fuzziness is the maximum edit distance allowed for matching.",
+                        "type": "object"
+                      },
+                      "minimumShouldMatch": {
+                        "description": "MinimumShouldMatch if the query string contains multiple search terms and you use the or operator, the number of terms that need to match for the document to be considered a match. See https://opensearch.org/docs/latest/query-dsl/minimum-should-match/",
+                        "type": "string"
+                      },
+                      "prefixLength": {
+                        "description": "PrefixLength is the number of beginning characters left unchanged for fuzzy matching. Optional, defaults to 0.",
+                        "format": "int64",
+                        "type": "string"
+                      },
+                      "query": {
+                        "type": "string"
+                      },
+                      "tieBreaker": {
+                        "type": "number"
+                      },
+                      "type": {
+                        "description": "Type is the multi-match query type. Valid values are best_fields, most_fields, cross_fields, phrase, phrase_prefix, bool_prefix. Default is best_fields.",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "prefix": {
+                    "properties": {
+                      "boost": {
+                        "type": "number"
+                      },
+                      "caseInsensitive": {
+                        "type": "boolean"
+                      },
+                      "field": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "queryString": {
+                    "type": "string"
+                  },
+                  "range": {
+                    "properties": {
+                      "field": {
+                        "type": "string"
+                      },
+                      "gt": {
+                        "type": "string"
+                      },
+                      "gte": {
+                        "type": "string"
+                      },
+                      "lt": {
+                        "type": "string"
+                      },
+                      "lte": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "term": {
+                    "properties": {
+                      "boost": {
+                        "type": "number"
+                      },
+                      "field": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "terms": {
+                    "properties": {
+                      "boost": {
+                        "type": "number"
+                      },
+                      "field": {
+                        "type": "string"
+                      },
+                      "values": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "should": {
+              "items": {
+                "properties": {
+                  "bool": {
+                    "properties": {
+                      "filter": {
+                        "items": {
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "minimumShouldMatch": {
+                        "format": "int64",
+                        "type": "string"
+                      },
+                      "must": {
+                        "items": {
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "mustNot": {
+                        "items": {
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "should": {
+                        "items": {
+                          "type": "object"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "exists": {
+                    "type": "string"
+                  },
+                  "match": {
+                    "properties": {
+                      "boost": {
+                        "type": "number"
+                      },
+                      "field": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "matchAll": {
+                    "type": "object"
+                  },
+                  "matchPhrase": {
+                    "properties": {
+                      "field": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "multiMatch": {
+                    "properties": {
+                      "booleanAnd": {
+                        "description": "BooleanAnd can be used to require all terms to match.",
+                        "type": "boolean"
+                      },
+                      "boost": {
+                        "type": "number"
+                      },
+                      "fields": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "fuzziness": {
+                        "description": "Fuzziness is the maximum edit distance allowed for matching.",
+                        "type": "object"
+                      },
+                      "minimumShouldMatch": {
+                        "description": "MinimumShouldMatch if the query string contains multiple search terms and you use the or operator, the number of terms that need to match for the document to be considered a match. See https://opensearch.org/docs/latest/query-dsl/minimum-should-match/",
+                        "type": "string"
+                      },
+                      "prefixLength": {
+                        "description": "PrefixLength is the number of beginning characters left unchanged for fuzzy matching. Optional, defaults to 0.",
+                        "format": "int64",
+                        "type": "string"
+                      },
+                      "query": {
+                        "type": "string"
+                      },
+                      "tieBreaker": {
+                        "type": "number"
+                      },
+                      "type": {
+                        "description": "Type is the multi-match query type. Valid values are best_fields, most_fields, cross_fields, phrase, phrase_prefix, bool_prefix. Default is best_fields.",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "prefix": {
+                    "properties": {
+                      "boost": {
+                        "type": "number"
+                      },
+                      "caseInsensitive": {
+                        "type": "boolean"
+                      },
+                      "field": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "queryString": {
+                    "type": "string"
+                  },
+                  "range": {
+                    "properties": {
+                      "field": {
+                        "type": "string"
+                      },
+                      "gt": {
+                        "type": "string"
+                      },
+                      "gte": {
+                        "type": "string"
+                      },
+                      "lt": {
+                        "type": "string"
+                      },
+                      "lte": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "term": {
+                    "properties": {
+                      "boost": {
+                        "type": "number"
+                      },
+                      "field": {
+                        "type": "string"
+                      },
+                      "value": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "terms": {
+                    "properties": {
+                      "boost": {
+                        "type": "number"
+                      },
+                      "field": {
+                        "type": "string"
+                      },
+                      "values": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "exists": {
+          "type": "string"
+        },
+        "match": {
+          "properties": {
+            "boost": {
+              "type": "number"
+            },
+            "field": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "matchAll": {
+          "type": "object"
+        },
+        "matchPhrase": {
+          "properties": {
+            "field": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "multiMatch": {
+          "properties": {
+            "booleanAnd": {
+              "description": "BooleanAnd can be used to require all terms to match.",
+              "type": "boolean"
+            },
+            "boost": {
+              "type": "number"
+            },
+            "fields": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "fuzziness": {
+              "description": "Fuzziness is the maximum edit distance allowed for matching.",
+              "properties": {
+                "edits": {
+                  "description": "Edits is the maximum allowed Levenshtein Edit Distance (or number of edits).",
+                  "format": "int64",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "minimumShouldMatch": {
+              "description": "MinimumShouldMatch if the query string contains multiple search terms and you use the or operator, the number of terms that need to match for the document to be considered a match. See https://opensearch.org/docs/latest/query-dsl/minimum-should-match/",
+              "type": "string"
+            },
+            "prefixLength": {
+              "description": "PrefixLength is the number of beginning characters left unchanged for fuzzy matching. Optional, defaults to 0.",
+              "format": "int64",
+              "type": "string"
+            },
+            "query": {
+              "type": "string"
+            },
+            "tieBreaker": {
+              "type": "number"
+            },
+            "type": {
+              "description": "Type is the multi-match query type. Valid values are best_fields, most_fields, cross_fields, phrase, phrase_prefix, bool_prefix. Default is best_fields.",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "prefix": {
+          "properties": {
+            "boost": {
+              "type": "number"
+            },
+            "caseInsensitive": {
+              "type": "boolean"
+            },
+            "field": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "queryString": {
+          "type": "string"
+        },
+        "range": {
+          "properties": {
+            "field": {
+              "type": "string"
+            },
+            "gt": {
+              "type": "string"
+            },
+            "gte": {
+              "type": "string"
+            },
+            "lt": {
+              "type": "string"
+            },
+            "lte": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "term": {
+          "properties": {
+            "boost": {
+              "type": "number"
+            },
+            "field": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "terms": {
+          "properties": {
+            "boost": {
+              "type": "number"
+            },
+            "field": {
+              "type": "string"
+            },
+            "values": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "searchAfter": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "shared": {
+      "description": "Shared performs the query without the identity of the user, allows for better query caching and shared subscriptions.",
+      "type": "boolean"
+    },
+    "size": {
+      "format": "int64",
+      "type": "string"
+    },
+    "sort": {
+      "items": {
+        "properties": {
+          "desc": {
+            "type": "boolean"
+          },
+          "field": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "source": {
+      "type": "boolean"
+    },
+    "subscribe": {
+      "description": "Subscribe starts a subscription for the query.",
+      "type": "boolean"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "hits": {
+      "properties": {
+        "hits": {
+          "items": {
+            "properties": {
+              "document": {
+                "properties": {
+                  "content": {
+                    "items": {
+                      "properties": {
+                        "content": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "contenttype": {
+                          "type": "string"
+                        },
+                        "data": {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "links": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "meta": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "rel": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        },
+                        "sensitivity": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "uri": {
+                          "type": "string"
+                        },
+                        "url": {
+                          "type": "string"
+                        },
+                        "uuid": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "language": {
+                    "type": "string"
+                  },
+                  "links": {
+                    "items": {
+                      "properties": {
+                        "content": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "contenttype": {
+                          "type": "string"
+                        },
+                        "data": {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "links": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "meta": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "rel": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        },
+                        "sensitivity": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "uri": {
+                          "type": "string"
+                        },
+                        "url": {
+                          "type": "string"
+                        },
+                        "uuid": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "meta": {
+                    "items": {
+                      "properties": {
+                        "content": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "contenttype": {
+                          "type": "string"
+                        },
+                        "data": {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "links": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "meta": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "rel": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        },
+                        "sensitivity": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "uri": {
+                          "type": "string"
+                        },
+                        "url": {
+                          "type": "string"
+                        },
+                        "uuid": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "uri": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "uuid": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "fields": {
+                "additionalProperties": {
+                  "properties": {
+                    "values": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "object"
+              },
+              "id": {
+                "type": "string"
+              },
+              "score": {
+                "type": "number"
+              },
+              "sort": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "source": {
+                "additionalProperties": {
+                  "properties": {
+                    "values": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "maxScore": {
+          "type": "number"
+        },
+        "total": {
+          "properties": {
+            "relation": {
+              "type": "string"
+            },
+            "value": {
+              "format": "int64",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "shards": {
+      "properties": {
+        "failed": {
+          "type": "integer"
+        },
+        "skipped": {
+          "type": "integer"
+        },
+        "successful": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "subscription": {
+      "description": "Subsciption for search results, if any was started.",
+      "properties": {
+        "cursor": {
+          "description": "Cursor for current subscription position.",
+          "format": "int64",
+          "type": "string"
+        },
+        "id": {
+          "description": "ID of the subscription.",
+          "format": "int64",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "timedOut": {
+      "type": "boolean"
+    },
+    "took": {
+      "format": "int64",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "index")
 			if err != nil {
 				return err
@@ -57,8 +1365,574 @@ func searchV1MultiSearchCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "multi-search",
 		Usage: "Call SearchV1.MultiSearch",
-		Flags: fileFlag(),
+		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "queries": {
+      "items": {
+        "properties": {
+          "documentType": {
+            "type": "string"
+          },
+          "fields": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "from": {
+            "format": "int64",
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "loadDocument": {
+            "description": "LoadDocument will load the current version of the document from the repository and include it with the search response.",
+            "type": "boolean"
+          },
+          "query": {
+            "properties": {
+              "bool": {
+                "properties": {
+                  "filter": {
+                    "items": {
+                      "properties": {
+                        "bool": {
+                          "type": "object"
+                        },
+                        "exists": {
+                          "type": "string"
+                        },
+                        "match": {
+                          "type": "object"
+                        },
+                        "matchAll": {
+                          "type": "object"
+                        },
+                        "matchPhrase": {
+                          "type": "object"
+                        },
+                        "multiMatch": {
+                          "type": "object"
+                        },
+                        "prefix": {
+                          "type": "object"
+                        },
+                        "queryString": {
+                          "type": "string"
+                        },
+                        "range": {
+                          "type": "object"
+                        },
+                        "term": {
+                          "type": "object"
+                        },
+                        "terms": {
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "minimumShouldMatch": {
+                    "format": "int64",
+                    "type": "string"
+                  },
+                  "must": {
+                    "items": {
+                      "properties": {
+                        "bool": {
+                          "type": "object"
+                        },
+                        "exists": {
+                          "type": "string"
+                        },
+                        "match": {
+                          "type": "object"
+                        },
+                        "matchAll": {
+                          "type": "object"
+                        },
+                        "matchPhrase": {
+                          "type": "object"
+                        },
+                        "multiMatch": {
+                          "type": "object"
+                        },
+                        "prefix": {
+                          "type": "object"
+                        },
+                        "queryString": {
+                          "type": "string"
+                        },
+                        "range": {
+                          "type": "object"
+                        },
+                        "term": {
+                          "type": "object"
+                        },
+                        "terms": {
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "mustNot": {
+                    "items": {
+                      "properties": {
+                        "bool": {
+                          "type": "object"
+                        },
+                        "exists": {
+                          "type": "string"
+                        },
+                        "match": {
+                          "type": "object"
+                        },
+                        "matchAll": {
+                          "type": "object"
+                        },
+                        "matchPhrase": {
+                          "type": "object"
+                        },
+                        "multiMatch": {
+                          "type": "object"
+                        },
+                        "prefix": {
+                          "type": "object"
+                        },
+                        "queryString": {
+                          "type": "string"
+                        },
+                        "range": {
+                          "type": "object"
+                        },
+                        "term": {
+                          "type": "object"
+                        },
+                        "terms": {
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "should": {
+                    "items": {
+                      "properties": {
+                        "bool": {
+                          "type": "object"
+                        },
+                        "exists": {
+                          "type": "string"
+                        },
+                        "match": {
+                          "type": "object"
+                        },
+                        "matchAll": {
+                          "type": "object"
+                        },
+                        "matchPhrase": {
+                          "type": "object"
+                        },
+                        "multiMatch": {
+                          "type": "object"
+                        },
+                        "prefix": {
+                          "type": "object"
+                        },
+                        "queryString": {
+                          "type": "string"
+                        },
+                        "range": {
+                          "type": "object"
+                        },
+                        "term": {
+                          "type": "object"
+                        },
+                        "terms": {
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "exists": {
+                "type": "string"
+              },
+              "match": {
+                "properties": {
+                  "boost": {
+                    "type": "number"
+                  },
+                  "field": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "matchAll": {
+                "type": "object"
+              },
+              "matchPhrase": {
+                "properties": {
+                  "field": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "multiMatch": {
+                "properties": {
+                  "booleanAnd": {
+                    "description": "BooleanAnd can be used to require all terms to match.",
+                    "type": "boolean"
+                  },
+                  "boost": {
+                    "type": "number"
+                  },
+                  "fields": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "fuzziness": {
+                    "description": "Fuzziness is the maximum edit distance allowed for matching.",
+                    "properties": {
+                      "edits": {
+                        "description": "Edits is the maximum allowed Levenshtein Edit Distance (or number of edits).",
+                        "format": "int64",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "minimumShouldMatch": {
+                    "description": "MinimumShouldMatch if the query string contains multiple search terms and you use the or operator, the number of terms that need to match for the document to be considered a match. See https://opensearch.org/docs/latest/query-dsl/minimum-should-match/",
+                    "type": "string"
+                  },
+                  "prefixLength": {
+                    "description": "PrefixLength is the number of beginning characters left unchanged for fuzzy matching. Optional, defaults to 0.",
+                    "format": "int64",
+                    "type": "string"
+                  },
+                  "query": {
+                    "type": "string"
+                  },
+                  "tieBreaker": {
+                    "type": "number"
+                  },
+                  "type": {
+                    "description": "Type is the multi-match query type. Valid values are best_fields, most_fields, cross_fields, phrase, phrase_prefix, bool_prefix. Default is best_fields.",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "prefix": {
+                "properties": {
+                  "boost": {
+                    "type": "number"
+                  },
+                  "caseInsensitive": {
+                    "type": "boolean"
+                  },
+                  "field": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "queryString": {
+                "type": "string"
+              },
+              "range": {
+                "properties": {
+                  "field": {
+                    "type": "string"
+                  },
+                  "gt": {
+                    "type": "string"
+                  },
+                  "gte": {
+                    "type": "string"
+                  },
+                  "lt": {
+                    "type": "string"
+                  },
+                  "lte": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "term": {
+                "properties": {
+                  "boost": {
+                    "type": "number"
+                  },
+                  "field": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "terms": {
+                "properties": {
+                  "boost": {
+                    "type": "number"
+                  },
+                  "field": {
+                    "type": "string"
+                  },
+                  "values": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "searchAfter": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "shared": {
+            "description": "Shared performs the query without the identity of the user, allows for better query caching and shared subscriptions.",
+            "type": "boolean"
+          },
+          "size": {
+            "format": "int64",
+            "type": "string"
+          },
+          "sort": {
+            "items": {
+              "properties": {
+                "desc": {
+                  "type": "boolean"
+                },
+                "field": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "source": {
+            "type": "boolean"
+          },
+          "subscribe": {
+            "description": "Subscribe starts a subscription for the query.",
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "results": {
+      "items": {
+        "properties": {
+          "hits": {
+            "properties": {
+              "hits": {
+                "items": {
+                  "properties": {
+                    "document": {
+                      "properties": {
+                        "content": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "language": {
+                          "type": "string"
+                        },
+                        "links": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "meta": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "uri": {
+                          "type": "string"
+                        },
+                        "url": {
+                          "type": "string"
+                        },
+                        "uuid": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "fields": {
+                      "additionalProperties": {
+                        "properties": {
+                          "values": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "score": {
+                      "type": "number"
+                    },
+                    "sort": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "source": {
+                      "additionalProperties": {
+                        "properties": {
+                          "values": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "maxScore": {
+                "type": "number"
+              },
+              "total": {
+                "properties": {
+                  "relation": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "format": "int64",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "shards": {
+            "properties": {
+              "failed": {
+                "type": "integer"
+              },
+              "skipped": {
+                "type": "integer"
+              },
+              "successful": {
+                "type": "integer"
+              },
+              "total": {
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "subscription": {
+            "description": "Subsciption for search results, if any was started.",
+            "properties": {
+              "cursor": {
+                "description": "Cursor for current subscription position.",
+                "format": "int64",
+                "type": "string"
+              },
+              "id": {
+                "description": "ID of the subscription.",
+                "format": "int64",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "timedOut": {
+            "type": "boolean"
+          },
+          "took": {
+            "format": "int64",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "index")
 			if err != nil {
 				return err
@@ -88,8 +1962,66 @@ func searchV1GetMappingsCommand() *cli.Command {
 		Usage: "Call SearchV1.GetMappings",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "document-type"},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "documentType": {
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "properties": {
+      "items": {
+        "properties": {
+          "fields": {
+            "description": "Fields used for alternate indexing metods for the property.",
+            "items": {
+              "properties": {
+                "name": {
+                  "description": "Name of the field.",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "Type of the field. Does not exactly correspond to Open Search types, but represents the logical type.",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "name": {
+            "description": "Name of the property.",
+            "type": "string"
+          },
+          "path": {
+            "description": "Path used for alias properties.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type of the property.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "index")
 			if err != nil {
 				return err
@@ -120,8 +2052,362 @@ func searchV1PollSubscriptionCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "poll-subscription",
 		Usage: "Call SearchV1.PollSubscription",
-		Flags: fileFlag(),
+		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "batchDelayMs": {
+      "description": "BatchDelayMS is the number of milliseconds to wait for more items after the first. Optional, defaults to 200ms.",
+      "format": "int64",
+      "type": "string"
+    },
+    "maxWaitMs": {
+      "description": "MaxWaitMS is the maximum time to wait before returning an empty response. Optional, defaults to 10s.",
+      "format": "int64",
+      "type": "string"
+    },
+    "notifyOnly": {
+      "description": "NotifyOnly will skip loading any data to include with the hits.",
+      "type": "boolean"
+    },
+    "subscriptions": {
+      "description": "Subscriptions to poll.",
+      "items": {
+        "properties": {
+          "cursor": {
+            "description": "Cursor for current subscription position.",
+            "format": "int64",
+            "type": "string"
+          },
+          "id": {
+            "description": "ID of the subscription.",
+            "format": "int64",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "result": {
+      "description": "Results will be empty if the poll timed out.",
+      "items": {
+        "properties": {
+          "items": {
+            "description": "Items that matched or stopped matching the subscription.",
+            "items": {
+              "properties": {
+                "document": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "language": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "fields": {
+                  "additionalProperties": {
+                    "properties": {
+                      "values": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "object"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "match": {
+                  "type": "boolean"
+                },
+                "source": {
+                  "additionalProperties": {
+                    "properties": {
+                      "values": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "subscription": {
+            "description": "Subscription with current cursor position.",
+            "properties": {
+              "cursor": {
+                "description": "Cursor for current subscription position.",
+                "format": "int64",
+                "type": "string"
+              },
+              "id": {
+                "description": "ID of the subscription.",
+                "format": "int64",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "unknownSubscriptions": {
+      "description": "List of subscriptions that are unknown, have expired f.ex.",
+      "items": {
+        "format": "int64",
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "index")
 			if err != nil {
 				return err
@@ -151,8 +2437,28 @@ func searchV1EndSubscriptionCommand() *cli.Command {
 		Usage: "Call SearchV1.EndSubscription",
 		Flags: append([]cli.Flag{
 			&cli.Int64Flag{Name: "id"},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "id": {
+      "format": "int64",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "index")
 			if err != nil {
 				return err

@@ -29,8 +29,85 @@ func checkTextCommand() *cli.Command {
 			&cli.StringSliceFlag{Name: "text", Usage: "Text to spellcheck."},
 			&cli.StringFlag{Name: "language", Usage: "Language to check the text for."},
 			&cli.BoolFlag{Name: "suggestions", Usage: "Suggestions enables generation of suggestions for misspelled words. In interactive applications this should normally be done by calling the Suggestions method on demand."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "language": {
+      "description": "Language to check the text for.",
+      "type": "string"
+    },
+    "suggestions": {
+      "description": "Suggestions enables generation of suggestions for misspelled words. In interactive applications this should normally be done by calling the Suggestions method on demand.",
+      "type": "boolean"
+    },
+    "text": {
+      "description": "Text to spellcheck.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "misspelled": {
+      "items": {
+        "properties": {
+          "entries": {
+            "items": {
+              "properties": {
+                "level": {
+                  "description": "Level is the level of the correction.",
+                  "enum": [
+                    "LEVEL_UNSPECIFIED",
+                    "LEVEL_ERROR",
+                    "LEVEL_SUGGESTION"
+                  ],
+                  "type": "string"
+                },
+                "suggestions": {
+                  "description": "Suggestions for replacements.",
+                  "items": {
+                    "properties": {
+                      "description": {
+                        "type": "string"
+                      },
+                      "text": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "text": {
+                  "description": "Text that was used in the source text.",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "spell")
 			if err != nil {
 				return err
@@ -68,8 +145,49 @@ func checkSuggestionsCommand() *cli.Command {
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "text", Usage: "Text is the word or phrase to get suggestions for."},
 			&cli.StringFlag{Name: "language", Usage: "Language to get suggestions in."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "language": {
+      "description": "Language to get suggestions in.",
+      "type": "string"
+    },
+    "text": {
+      "description": "Text is the word or phrase to get suggestions for.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "suggestions": {
+      "description": "Suggestions for replacements.",
+      "items": {
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "spell")
 			if err != nil {
 				return err

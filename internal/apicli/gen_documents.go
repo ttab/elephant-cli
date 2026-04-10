@@ -59,8 +59,3657 @@ func documentsGetCommand() *cli.Command {
 			&cli.StringFlag{Name: "meta-document", Usage: "MetaDocument controls the inclusion of associated meta documents. \"META_INCLUDE\" will include the document if it exists. \"META_ONLY\" will only return the meta document, and will return a not found error if it doesn't exist. (values: META_NONE, META_INCLUDE, META_ONLY)"},
 			&cli.Int64Flag{Name: "meta-document-version", Usage: "MetaDocumentVersion is used to fetch a specific version of meta document. Can not be used with status. If status is specified, the version the meta document had at the time the status was set is returned. If ommited and status is not used, the latest meta document version is returned."},
 			&cli.StringSliceFlag{Name: "subset", Usage: "Subset returns a subset of the document as specified by a list of newsdoc value extractors."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "lock": {
+      "description": "Lock will lock the document for updates. This only affects the creation of new versions of the document, statuses can still be updated.",
+      "type": "boolean"
+    },
+    "metaDocument": {
+      "description": "MetaDocument controls the inclusion of associated meta documents. \"META_INCLUDE\" will include the document if it exists. \"META_ONLY\" will only return the meta document, and will return a not found error if it doesn't exist.",
+      "enum": [
+        "META_NONE",
+        "META_INCLUDE",
+        "META_ONLY"
+      ],
+      "type": "string"
+    },
+    "metaDocumentVersion": {
+      "description": "MetaDocumentVersion is used to fetch a specific version of meta document. Can not be used with status. If status is specified, the version the meta document had at the time the status was set is returned. If ommited and status is not used, the latest meta document version is returned.",
+      "format": "int64",
+      "type": "string"
+    },
+    "status": {
+      "description": "Status is used to fetch the version of the document references by the last status update. Can be used instead of specifying a version.",
+      "type": "string"
+    },
+    "subset": {
+      "description": "Subset returns a subset of the document as specified by a list of newsdoc value extractors.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "uuid": {
+      "description": "UUID of the document to get.",
+      "type": "string"
+    },
+    "version": {
+      "description": "Version to get, omit to get latest (or use status).",
+      "format": "int64",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "document": {
+      "description": "Document is the requested document.",
+      "properties": {
+        "content": {
+          "items": {
+            "properties": {
+              "content": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "contenttype": {
+                "type": "string"
+              },
+              "data": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "id": {
+                "type": "string"
+              },
+              "links": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "meta": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "name": {
+                "type": "string"
+              },
+              "rel": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "sensitivity": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "uri": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "uuid": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "language": {
+          "type": "string"
+        },
+        "links": {
+          "items": {
+            "properties": {
+              "content": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "contenttype": {
+                "type": "string"
+              },
+              "data": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "id": {
+                "type": "string"
+              },
+              "links": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "meta": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "name": {
+                "type": "string"
+              },
+              "rel": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "sensitivity": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "uri": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "uuid": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "meta": {
+          "items": {
+            "properties": {
+              "content": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "contenttype": {
+                "type": "string"
+              },
+              "data": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "id": {
+                "type": "string"
+              },
+              "links": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "meta": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "name": {
+                "type": "string"
+              },
+              "rel": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "sensitivity": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "uri": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "uuid": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "title": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "isMetaDocument": {
+      "description": "IsMetaDocument is true if the document is a meta document.",
+      "type": "boolean"
+    },
+    "mainDocument": {
+      "description": "MainDocument is the UUID of the main document if this is a meta document.",
+      "type": "string"
+    },
+    "meta": {
+      "description": "Meta contains the meta document, if requested, and if it exists.",
+      "properties": {
+        "document": {
+          "description": "Document is the requested document.",
+          "properties": {
+            "content": {
+              "items": {
+                "properties": {
+                  "content": {
+                    "items": {
+                      "properties": {
+                        "content": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "contenttype": {
+                          "type": "string"
+                        },
+                        "data": {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "links": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "meta": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "rel": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        },
+                        "sensitivity": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "uri": {
+                          "type": "string"
+                        },
+                        "url": {
+                          "type": "string"
+                        },
+                        "uuid": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "contenttype": {
+                    "type": "string"
+                  },
+                  "data": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "links": {
+                    "items": {
+                      "properties": {
+                        "content": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "contenttype": {
+                          "type": "string"
+                        },
+                        "data": {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "links": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "meta": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "rel": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        },
+                        "sensitivity": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "uri": {
+                          "type": "string"
+                        },
+                        "url": {
+                          "type": "string"
+                        },
+                        "uuid": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "meta": {
+                    "items": {
+                      "properties": {
+                        "content": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "contenttype": {
+                          "type": "string"
+                        },
+                        "data": {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "links": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "meta": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "rel": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        },
+                        "sensitivity": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "uri": {
+                          "type": "string"
+                        },
+                        "url": {
+                          "type": "string"
+                        },
+                        "uuid": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "rel": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string"
+                  },
+                  "sensitivity": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "uri": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "uuid": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "language": {
+              "type": "string"
+            },
+            "links": {
+              "items": {
+                "properties": {
+                  "content": {
+                    "items": {
+                      "properties": {
+                        "content": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "contenttype": {
+                          "type": "string"
+                        },
+                        "data": {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "links": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "meta": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "rel": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        },
+                        "sensitivity": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "uri": {
+                          "type": "string"
+                        },
+                        "url": {
+                          "type": "string"
+                        },
+                        "uuid": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "contenttype": {
+                    "type": "string"
+                  },
+                  "data": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "links": {
+                    "items": {
+                      "properties": {
+                        "content": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "contenttype": {
+                          "type": "string"
+                        },
+                        "data": {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "links": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "meta": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "rel": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        },
+                        "sensitivity": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "uri": {
+                          "type": "string"
+                        },
+                        "url": {
+                          "type": "string"
+                        },
+                        "uuid": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "meta": {
+                    "items": {
+                      "properties": {
+                        "content": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "contenttype": {
+                          "type": "string"
+                        },
+                        "data": {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "links": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "meta": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "rel": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        },
+                        "sensitivity": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "uri": {
+                          "type": "string"
+                        },
+                        "url": {
+                          "type": "string"
+                        },
+                        "uuid": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "rel": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string"
+                  },
+                  "sensitivity": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "uri": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "uuid": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "meta": {
+              "items": {
+                "properties": {
+                  "content": {
+                    "items": {
+                      "properties": {
+                        "content": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "contenttype": {
+                          "type": "string"
+                        },
+                        "data": {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "links": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "meta": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "rel": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        },
+                        "sensitivity": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "uri": {
+                          "type": "string"
+                        },
+                        "url": {
+                          "type": "string"
+                        },
+                        "uuid": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "contenttype": {
+                    "type": "string"
+                  },
+                  "data": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "type": "object"
+                  },
+                  "id": {
+                    "type": "string"
+                  },
+                  "links": {
+                    "items": {
+                      "properties": {
+                        "content": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "contenttype": {
+                          "type": "string"
+                        },
+                        "data": {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "links": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "meta": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "rel": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        },
+                        "sensitivity": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "uri": {
+                          "type": "string"
+                        },
+                        "url": {
+                          "type": "string"
+                        },
+                        "uuid": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "meta": {
+                    "items": {
+                      "properties": {
+                        "content": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "contenttype": {
+                          "type": "string"
+                        },
+                        "data": {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "links": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "meta": {
+                          "items": {
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "rel": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        },
+                        "sensitivity": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "uri": {
+                          "type": "string"
+                        },
+                        "url": {
+                          "type": "string"
+                        },
+                        "uuid": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "rel": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string"
+                  },
+                  "sensitivity": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "uri": {
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "uuid": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "title": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string"
+            },
+            "uri": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            },
+            "uuid": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "version": {
+          "description": "Version is the version of the returned document.",
+          "format": "int64",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "status": {
+      "description": "Status is returned if the document was requested by status name.",
+      "properties": {
+        "created": {
+          "description": "Created timestamp is the RFC3339 timestamp for when the status was created.",
+          "type": "string"
+        },
+        "creator": {
+          "description": "Creator of the status.",
+          "type": "string"
+        },
+        "id": {
+          "description": "ID of the status.",
+          "format": "int64",
+          "type": "string"
+        },
+        "meta": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Meta data for the status.",
+          "type": "object"
+        },
+        "metaDocVersion": {
+          "description": "MetaDocumentVersion is the version the meta document had at the time the status was set.",
+          "format": "int64",
+          "type": "string"
+        },
+        "version": {
+          "description": "Version of the document that the status refers to.",
+          "format": "int64",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "subset": {
+      "description": "Subset is the extracted subset of the document.",
+      "items": {
+        "properties": {
+          "extractor": {
+            "description": "Extractor index for the the extractor that produced the values.",
+            "format": "int64",
+            "type": "string"
+          },
+          "values": {
+            "additionalProperties": {
+              "properties": {
+                "annotation": {
+                  "description": "Annotations can be used to differentiate between different extracted values.",
+                  "type": "string"
+                },
+                "block": {
+                  "description": "Block is used for block extractors.",
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "role": {
+                  "description": "Role can be used to differentiate between different extracted values.",
+                  "type": "string"
+                },
+                "value": {
+                  "description": "Value is used for extracted attributes and data values.",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "description": "Values that were extracted.",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "version": {
+      "description": "Version is the version of the returned document.",
+      "format": "int64",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -106,8 +3755,955 @@ func documentsBulkGetCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "bulk-get",
 		Usage: "BulkGet loads multiple documents in a single request.",
-		Flags: fileFlag(),
+		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "documents": {
+      "description": "Documents to get.",
+      "items": {
+        "properties": {
+          "uuid": {
+            "description": "UUID of the document to get.",
+            "type": "string"
+          },
+          "version": {
+            "description": "Version to get, omit to get latest.",
+            "format": "int64",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "subset": {
+      "description": "Subset returns a subset of the documents as specified by a list of newsdoc value extractors.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "items": {
+      "items": {
+        "properties": {
+          "document": {
+            "description": "Document is the requested document.",
+            "properties": {
+              "content": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "language": {
+                "type": "string"
+              },
+              "links": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "meta": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "title": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "uri": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "uuid": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "subset": {
+            "description": "Subset is the extracted subset of the document.",
+            "items": {
+              "properties": {
+                "extractor": {
+                  "description": "Extractor index for the the extractor that produced the values.",
+                  "format": "int64",
+                  "type": "string"
+                },
+                "values": {
+                  "additionalProperties": {
+                    "properties": {
+                      "annotation": {
+                        "description": "Annotations can be used to differentiate between different extracted values.",
+                        "type": "string"
+                      },
+                      "block": {
+                        "description": "Block is used for block extractors.",
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "role": {
+                        "description": "Role can be used to differentiate between different extracted values.",
+                        "type": "string"
+                      },
+                      "value": {
+                        "description": "Value is used for extracted attributes and data values.",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "description": "Values that were extracted.",
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "uuid": {
+            "description": "UUID of the loaded document.",
+            "type": "string"
+          },
+          "version": {
+            "description": "Version is the version of the returned document.",
+            "format": "int64",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -139,8 +4735,114 @@ func documentsGetHistoryCommand() *cli.Command {
 			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to get the history for."},
 			&cli.Int64Flag{Name: "before", Usage: "Before is which version number we should start fetching history from, omit to start with the latest version."},
 			&cli.BoolFlag{Name: "load-statuses", Usage: "LoadStatuses loads any statuses set on the document versions."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "before": {
+      "description": "Before is which version number we should start fetching history from, omit to start with the latest version.",
+      "format": "int64",
+      "type": "string"
+    },
+    "loadStatuses": {
+      "description": "LoadStatuses loads any statuses set on the document versions.",
+      "type": "boolean"
+    },
+    "uuid": {
+      "description": "UUID of the document to get the history for.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "versions": {
+      "items": {
+        "properties": {
+          "created": {
+            "description": "Created timestamp is the RFC3339 timestamp for when the version was created.",
+            "type": "string"
+          },
+          "creator": {
+            "description": "Creator of the version.",
+            "type": "string"
+          },
+          "meta": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Meta data to for the document version.",
+            "type": "object"
+          },
+          "statuses": {
+            "additionalProperties": {
+              "properties": {
+                "items": {
+                  "items": {
+                    "properties": {
+                      "created": {
+                        "description": "Created timestamp is the RFC3339 timestamp for when the status was created.",
+                        "type": "string"
+                      },
+                      "creator": {
+                        "description": "Creator of the status.",
+                        "type": "string"
+                      },
+                      "id": {
+                        "description": "ID of the status.",
+                        "format": "int64",
+                        "type": "string"
+                      },
+                      "meta": {
+                        "additionalProperties": {
+                          "type": "string"
+                        },
+                        "description": "Meta data for the status.",
+                        "type": "object"
+                      },
+                      "metaDocVersion": {
+                        "description": "MetaDocumentVersion is the version the meta document had at the time the status was set.",
+                        "format": "int64",
+                        "type": "string"
+                      },
+                      "version": {
+                        "description": "Version of the document that the status refers to.",
+                        "format": "int64",
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            },
+            "description": "Statuses that have been set for the document version.",
+            "type": "object"
+          },
+          "version": {
+            "description": "Version of the document.",
+            "format": "int64",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -173,8 +4875,2607 @@ func documentsUpdateCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "update",
 		Usage: "Update is used to create new document versions, set statuses, update ACLs.",
-		Flags: fileFlag(),
+		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "description": "UpdateRequest creates a new document version and/or sets statuses and ACLs for a document. The update is transactional will fail or succed as a whole.  If the document fails validation an \"invalid_argument\" error will be returned with the number of errors as meta \"err_count\" and the individual errors as \"0\", \"1\", \"2\"... Use the Validate method to get th errors as structured data.",
+  "properties": {
+    "acl": {
+      "description": "ACL is an ACL list controlling access to the document.",
+      "items": {
+        "properties": {
+          "permissions": {
+            "description": "Permissions given to the grantee.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "uri": {
+            "description": "URI that identifies the party that's granted access.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "attachObjects": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "AttachObjects is used to attach uploaded objects to a document. This must be done in combination with a document create or update. The key is the object name, f.ex. \"image\" or \"audio\", and the value is an upload ID. See CreateUpload().",
+      "type": "object"
+    },
+    "detachObjects": {
+      "description": "DetatchObjects is used to detach uploaded objects from a document. This must be done in combination with a document create or update.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "document": {
+      "description": "Document version to create.",
+      "properties": {
+        "content": {
+          "items": {
+            "properties": {
+              "content": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "contenttype": {
+                "type": "string"
+              },
+              "data": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "id": {
+                "type": "string"
+              },
+              "links": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "meta": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "name": {
+                "type": "string"
+              },
+              "rel": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "sensitivity": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "uri": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "uuid": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "language": {
+          "type": "string"
+        },
+        "links": {
+          "items": {
+            "properties": {
+              "content": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "contenttype": {
+                "type": "string"
+              },
+              "data": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "id": {
+                "type": "string"
+              },
+              "links": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "meta": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "name": {
+                "type": "string"
+              },
+              "rel": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "sensitivity": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "uri": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "uuid": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "meta": {
+          "items": {
+            "properties": {
+              "content": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "contenttype": {
+                "type": "string"
+              },
+              "data": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "id": {
+                "type": "string"
+              },
+              "links": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "meta": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "name": {
+                "type": "string"
+              },
+              "rel": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "sensitivity": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "uri": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "uuid": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "title": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "ifMatch": {
+      "description": "IfMatch is used for optimistic locks. Set to the version that you require to be the current one for the update to be performed, or -1 to only perform the update if the document doesn't already exist.",
+      "format": "int64",
+      "type": "string"
+    },
+    "ifStatusHeads": {
+      "additionalProperties": {
+        "format": "int64",
+        "type": "string"
+      },
+      "description": "IfStatusHeads is used to only perform the update if the status heads match.",
+      "type": "object"
+    },
+    "ifWorkflowState": {
+      "description": "IfWorkflowState is used to only perform the update if it's in the specified workflow state.",
+      "type": "string"
+    },
+    "importDirective": {
+      "description": "ImportDirective can be used to preserve timestamps and authorship information from originating systems, but requires the \"import_directive\" scope for use.",
+      "properties": {
+        "originalCreator": {
+          "type": "string"
+        },
+        "originallyCreated": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "lockToken": {
+      "description": "LockToken is used for explicit pessimistic locking.",
+      "type": "string"
+    },
+    "meta": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Meta data to associate with the document version.",
+      "type": "object"
+    },
+    "status": {
+      "description": "Status updates to perform.",
+      "items": {
+        "properties": {
+          "ifMatch": {
+            "description": "IfMatch is used for optimistic locks. Set to the status id that you require to be the current one for the status to be set, or -1 to only perform the update if the status hasn't previously been set.",
+            "format": "int64",
+            "type": "string"
+          },
+          "meta": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Meta data to include with the status update.",
+            "type": "object"
+          },
+          "name": {
+            "description": "Name of the status to set.",
+            "type": "string"
+          },
+          "version": {
+            "description": "Version to set the status for. Set to -1 to signal that the status no longer is valid for the document. Optional if part of a document update request as it then will default to the version being written.",
+            "format": "int64",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "updateMetaDocument": {
+      "description": "UpdateMetaDocument can be set to true to update the meta document instead of the document identified by the UUID.",
+      "type": "boolean"
+    },
+    "uuid": {
+      "description": "UUID of the document to update.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "description": "UpdateResponse describes the result of an update request.",
+  "properties": {
+    "uuid": {
+      "type": "string"
+    },
+    "version": {
+      "format": "int64",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -202,8 +7503,949 @@ func documentsBulkUpdateCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "bulk-update",
 		Usage: "BulkUpdate is used to create new document versions, set statuses, update ACLs.",
-		Flags: fileFlag(),
+		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "updates": {
+      "items": {
+        "description": "UpdateRequest creates a new document version and/or sets statuses and ACLs for a document. The update is transactional will fail or succed as a whole.  If the document fails validation an \"invalid_argument\" error will be returned with the number of errors as meta \"err_count\" and the individual errors as \"0\", \"1\", \"2\"... Use the Validate method to get th errors as structured data.",
+        "properties": {
+          "acl": {
+            "description": "ACL is an ACL list controlling access to the document.",
+            "items": {
+              "properties": {
+                "permissions": {
+                  "description": "Permissions given to the grantee.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "uri": {
+                  "description": "URI that identifies the party that's granted access.",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "attachObjects": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "AttachObjects is used to attach uploaded objects to a document. This must be done in combination with a document create or update. The key is the object name, f.ex. \"image\" or \"audio\", and the value is an upload ID. See CreateUpload().",
+            "type": "object"
+          },
+          "detachObjects": {
+            "description": "DetatchObjects is used to detach uploaded objects from a document. This must be done in combination with a document create or update.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "document": {
+            "description": "Document version to create.",
+            "properties": {
+              "content": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "language": {
+                "type": "string"
+              },
+              "links": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "meta": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "title": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "uri": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "uuid": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "ifMatch": {
+            "description": "IfMatch is used for optimistic locks. Set to the version that you require to be the current one for the update to be performed, or -1 to only perform the update if the document doesn't already exist.",
+            "format": "int64",
+            "type": "string"
+          },
+          "ifStatusHeads": {
+            "additionalProperties": {
+              "format": "int64",
+              "type": "string"
+            },
+            "description": "IfStatusHeads is used to only perform the update if the status heads match.",
+            "type": "object"
+          },
+          "ifWorkflowState": {
+            "description": "IfWorkflowState is used to only perform the update if it's in the specified workflow state.",
+            "type": "string"
+          },
+          "importDirective": {
+            "description": "ImportDirective can be used to preserve timestamps and authorship information from originating systems, but requires the \"import_directive\" scope for use.",
+            "properties": {
+              "originalCreator": {
+                "type": "string"
+              },
+              "originallyCreated": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "lockToken": {
+            "description": "LockToken is used for explicit pessimistic locking.",
+            "type": "string"
+          },
+          "meta": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Meta data to associate with the document version.",
+            "type": "object"
+          },
+          "status": {
+            "description": "Status updates to perform.",
+            "items": {
+              "properties": {
+                "ifMatch": {
+                  "description": "IfMatch is used for optimistic locks. Set to the status id that you require to be the current one for the status to be set, or -1 to only perform the update if the status hasn't previously been set.",
+                  "format": "int64",
+                  "type": "string"
+                },
+                "meta": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "description": "Meta data to include with the status update.",
+                  "type": "object"
+                },
+                "name": {
+                  "description": "Name of the status to set.",
+                  "type": "string"
+                },
+                "version": {
+                  "description": "Version to set the status for. Set to -1 to signal that the status no longer is valid for the document. Optional if part of a document update request as it then will default to the version being written.",
+                  "format": "int64",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "updateMetaDocument": {
+            "description": "UpdateMetaDocument can be set to true to update the meta document instead of the document identified by the UUID.",
+            "type": "boolean"
+          },
+          "uuid": {
+            "description": "UUID of the document to update.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "updates": {
+      "items": {
+        "description": "UpdateResponse describes the result of an update request.",
+        "properties": {
+          "uuid": {
+            "type": "string"
+          },
+          "version": {
+            "format": "int64",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -231,8 +8473,2529 @@ func documentsValidateCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "validate",
 		Usage: "Validate is used to validate a document without writing it to the repository.",
-		Flags: fileFlag(),
+		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "document": {
+      "properties": {
+        "content": {
+          "items": {
+            "properties": {
+              "content": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "contenttype": {
+                "type": "string"
+              },
+              "data": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "id": {
+                "type": "string"
+              },
+              "links": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "meta": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "name": {
+                "type": "string"
+              },
+              "rel": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "sensitivity": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "uri": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "uuid": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "language": {
+          "type": "string"
+        },
+        "links": {
+          "items": {
+            "properties": {
+              "content": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "contenttype": {
+                "type": "string"
+              },
+              "data": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "id": {
+                "type": "string"
+              },
+              "links": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "meta": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "name": {
+                "type": "string"
+              },
+              "rel": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "sensitivity": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "uri": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "uuid": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "meta": {
+          "items": {
+            "properties": {
+              "content": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "contenttype": {
+                "type": "string"
+              },
+              "data": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "id": {
+                "type": "string"
+              },
+              "links": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "meta": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "name": {
+                "type": "string"
+              },
+              "rel": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "sensitivity": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "uri": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "uuid": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "title": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "uuid": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "errors": {
+      "items": {
+        "properties": {
+          "entity": {
+            "items": {
+              "properties": {
+                "index": {
+                  "description": "Index is the position of the entity in an array, where applicable.",
+                  "format": "int64",
+                  "type": "string"
+                },
+                "kind": {
+                  "description": "Kind is the block type, one of \"link\", \"meta\", or \"content\".",
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Name is the name of the entity, where applicable.",
+                  "type": "string"
+                },
+                "refType": {
+                  "description": "RefType is type of entity that's referenced, one of \"block\", \"property\", \"attribute\", \"data attribute\", or \"parameter.\"",
+                  "type": "string"
+                },
+                "rel": {
+                  "description": "Rel is the relationship for the entity, where applicable.",
+                  "type": "string"
+                },
+                "type": {
+                  "description": "Type is the type of the entity, where applicable.",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -264,8 +11027,45 @@ func documentsEvictCommand() *cli.Command {
 			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to evict versions of."},
 			&cli.Int64Flag{Name: "version", Usage: "Version can be set to a specific version to evict, optional."},
 			&cli.Int64Flag{Name: "until-version", Usage: "UntilVersion can be set to evict all versions up to (inclusive) the specified version, optional. A negative value will be interpreted as relative to the current version, set to -1 to evict all non-current versions."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "untilVersion": {
+      "description": "UntilVersion can be set to evict all versions up to (inclusive) the specified version, optional. A negative value will be interpreted as relative to the current version, set to -1 to evict all non-current versions.",
+      "format": "int64",
+      "type": "string"
+    },
+    "uuid": {
+      "description": "UUID of the document to evict versions of.",
+      "type": "string"
+    },
+    "version": {
+      "description": "Version can be set to a specific version to evict, optional.",
+      "format": "int64",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "evictCount": {
+      "description": "EvictCount is the number of versions that were evicted.",
+      "format": "int64",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -303,8 +11103,44 @@ func documentsDeleteCommand() *cli.Command {
 			&cli.StringMapFlag{Name: "meta", Usage: "Meta data to include with the delete record."},
 			&cli.Int64Flag{Name: "if-match", Usage: "IfMatch is used for optimistic locks. Set to the version that you require to be the current one for the delete to be performed."},
 			&cli.StringFlag{Name: "lockToken", Usage: "LockToken is used for explicit pessimistic locking."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "ifMatch": {
+      "description": "IfMatch is used for optimistic locks. Set to the version that you require to be the current one for the delete to be performed.",
+      "format": "int64",
+      "type": "string"
+    },
+    "lockToken": {
+      "description": "LockToken is used for explicit pessimistic locking.",
+      "type": "string"
+    },
+    "meta": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Meta data to include with the delete record.",
+      "type": "object"
+    },
+    "uuid": {
+      "description": "UUID of the document to delete.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -345,8 +11181,101 @@ func documentsListDeletedCommand() *cli.Command {
 			&cli.Int64Flag{Name: "before-id", Usage: "BeforeID is used to paginate backwards in deletions. Optional."},
 			&cli.StringFlag{Name: "before-date", Usage: "BeforeDate is used to get deletions going back from before the specified date YYYY-MM-DD. Optional, will be ignored if before_id is specified."},
 			&cli.StringFlag{Name: "timezone", Usage: "Timezone that the date should be interpreted in."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "beforeDate": {
+      "description": "BeforeDate is used to get deletions going back from before the specified date YYYY-MM-DD. Optional, will be ignored if before_id is specified.",
+      "type": "string"
+    },
+    "beforeId": {
+      "description": "BeforeID is used to paginate backwards in deletions. Optional.",
+      "format": "int64",
+      "type": "string"
+    },
+    "timezone": {
+      "description": "Timezone that the date should be interpreted in.",
+      "type": "string"
+    },
+    "uuid": {
+      "description": "UUID of the document list deletions of. Optional.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "deletes": {
+      "description": "Deletes that have been performed on document instances with the given UUID.",
+      "items": {
+        "properties": {
+          "created": {
+            "description": "Creation time for the delete record, as an RFC3339 timestamp.",
+            "type": "string"
+          },
+          "creator": {
+            "description": "Creator of the delete record.",
+            "type": "string"
+          },
+          "finalised": {
+            "description": "Finalised is the time, as an RFC3339 timestamp, that the document finished deleting. Empty if the delete is in progress.",
+            "type": "string"
+          },
+          "id": {
+            "description": "ID of the delete record.",
+            "format": "int64",
+            "type": "string"
+          },
+          "language": {
+            "description": "Language that the document was in.",
+            "type": "string"
+          },
+          "meta": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Meta data included with the delete record.",
+            "type": "object"
+          },
+          "purged": {
+            "description": "Purged is the time, as an RFC3339 timestamp, all archived data for the document was purged. Empty if the document hasn't been purged.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type of the document.",
+            "type": "string"
+          },
+          "uri": {
+            "description": "URI of the document.",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "UUID of the document.",
+            "type": "string"
+          },
+          "version": {
+            "description": "Version that the document had at the time of restore.",
+            "format": "int64",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -380,8 +11309,53 @@ func documentsRestoreCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "restore",
 		Usage: "Restore recovers a deleted document.",
-		Flags: fileFlag(),
+		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "acl": {
+      "description": "ACL that should be set for the restored document.",
+      "items": {
+        "properties": {
+          "permissions": {
+            "description": "Permissions given to the grantee.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "uri": {
+            "description": "URI that identifies the party that's granted access.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "deleteRecordId": {
+      "description": "DeleteRecordID for the specific instance of the document that was deleted.",
+      "format": "int64",
+      "type": "string"
+    },
+    "uuid": {
+      "description": "UUID of the document to restore.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -412,8 +11386,33 @@ func documentsPurgeCommand() *cli.Command {
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to purge."},
 			&cli.Int64Flag{Name: "delete-record-id", Usage: "DeleteRecordID for the specific instance of the document that should be purged."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "deleteRecordId": {
+      "description": "DeleteRecordID for the specific instance of the document that should be purged.",
+      "format": "int64",
+      "type": "string"
+    },
+    "uuid": {
+      "description": "UUID of the document to purge.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -447,8 +11446,187 @@ func documentsGetMetaCommand() *cli.Command {
 		Usage: "GetMeta returns metadata for a document, including the ACL and current status heads.",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to get metadata for"},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "uuid": {
+      "description": "UUID of the document to get metadata for",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "meta": {
+      "properties": {
+        "acl": {
+          "description": "ACL is an ACL list controlling access to the document.",
+          "items": {
+            "properties": {
+              "permissions": {
+                "description": "Permissions given to the grantee.",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "uri": {
+                "description": "URI that identifies the party that's granted access.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "attachments": {
+          "description": "Attachments are the names of the attached objects (files) for a document.",
+          "items": {
+            "properties": {
+              "name": {
+                "description": "Name of the attachment.",
+                "type": "string"
+              },
+              "version": {
+                "description": "Version is the current version of the attachment.",
+                "format": "int64",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "created": {
+          "description": "Created timestamp is the RFC3339 timestamp for when the document was created.",
+          "type": "string"
+        },
+        "creatorUri": {
+          "description": "CreatorURI is the identity of the party that created the document.",
+          "type": "string"
+        },
+        "currentVersion": {
+          "description": "CurrentVersion is the last written version of the document.",
+          "format": "int64",
+          "type": "string"
+        },
+        "heads": {
+          "additionalProperties": {
+            "properties": {
+              "created": {
+                "description": "Created timestamp is the RFC3339 timestamp for when the status was created.",
+                "type": "string"
+              },
+              "creator": {
+                "description": "Creator of the status.",
+                "type": "string"
+              },
+              "id": {
+                "description": "ID of the status.",
+                "format": "int64",
+                "type": "string"
+              },
+              "meta": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "Meta data for the status.",
+                "type": "object"
+              },
+              "metaDocVersion": {
+                "description": "MetaDocumentVersion is the version the meta document had at the time the status was set.",
+                "format": "int64",
+                "type": "string"
+              },
+              "version": {
+                "description": "Version of the document that the status refers to.",
+                "format": "int64",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "description": "Heads are the last statuses.",
+          "type": "object"
+        },
+        "isMetaDocument": {
+          "description": "IsMetaDocument is true if the document is a meta document.",
+          "type": "boolean"
+        },
+        "lock": {
+          "description": "Document lock, if any",
+          "properties": {
+            "app": {
+              "description": "URI identifying the locking application.",
+              "type": "string"
+            },
+            "comment": {
+              "description": "Optional free-form comment.",
+              "type": "string"
+            },
+            "created": {
+              "description": "Created timestamp is the RFC3339 timestamp for when the lock was created.",
+              "type": "string"
+            },
+            "expires": {
+              "description": "Expires timestamp is the RFC3339 timestamp for when the lock will expire.",
+              "type": "string"
+            },
+            "token": {
+              "description": "Lock token string",
+              "type": "string"
+            },
+            "uri": {
+              "description": "URI of the lock owner",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "mainDocument": {
+          "description": "MainDocument is the UUID of the main document if this is a meta document.",
+          "type": "string"
+        },
+        "modified": {
+          "description": "Modified timestamp is the RFC3339 timestamp for the last change that affected the document.",
+          "type": "string"
+        },
+        "nonce": {
+          "description": "Nonce is the unique nonce for this document. If the document is deleted and recreated with the same ID it will still have a unique nonce.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Type is the type of the document.",
+          "type": "string"
+        },
+        "updaterUri": {
+          "description": "UpdaterURI is the identity of the party that last updated the document.",
+          "type": "string"
+        },
+        "workflowCheckpoint": {
+          "description": "WorkflowCheckpoint that the document reached most recently.",
+          "type": "string"
+        },
+        "workflowState": {
+          "description": "WorkflowState that the document is in.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -484,8 +11662,183 @@ func documentsEventlogCommand() *cli.Command {
 			&cli.Int64Flag{Name: "wait-ms", Usage: "Wait is the maximum time to wait for new events. Defaults to 2000."},
 			&cli.Int64Flag{Name: "batch-size", Usage: "BatchSize is the number of events we want in the response. Defaults to 10."},
 			&cli.Int64Flag{Name: "batch-wait-ms", Usage: "BatchWaitMs is the maximum time we wait for a batch to be filled. Defaults to 200."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "after": {
+      "description": "After specifies the event ID after which to start returning events. A negative value of -N will start from the N most recent events.",
+      "format": "int64",
+      "type": "string"
+    },
+    "batchSize": {
+      "description": "BatchSize is the number of events we want in the response. Defaults to 10.",
+      "type": "integer"
+    },
+    "batchWaitMs": {
+      "description": "BatchWaitMs is the maximum time we wait for a batch to be filled. Defaults to 200.",
+      "type": "integer"
+    },
+    "waitMs": {
+      "description": "Wait is the maximum time to wait for new events. Defaults to 2000.",
+      "type": "integer"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "items": {
+      "items": {
+        "properties": {
+          "acl": {
+            "description": "Acl entry, if it was an \"acl\" event.",
+            "items": {
+              "properties": {
+                "permissions": {
+                  "description": "Permissions given to the grantee.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "uri": {
+                  "description": "URI that identifies the party that's granted access.",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "attachedObjects": {
+            "description": "AttachedObjects contains the object names, f.ex. \"image\" or \"audio\", when when objects (files) were attached together with a document update.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "deleteRecordId": {
+            "description": "DeleteRecordId is the ID of the delete record if this was a delete event.",
+            "format": "int64",
+            "type": "string"
+          },
+          "detachedObjects": {
+            "description": "DetachedObjects contains the object names, f.ex. \"image\" or \"audio\", when when objects (files) were detached in a document update.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "documentNonce": {
+            "description": "DocumentNonce is the unique nonce for this document. If the document is deleted and recreated with the same ID it will still have a unique nonce.",
+            "type": "string"
+          },
+          "event": {
+            "description": "Event type, one of: \"document\", \"status\", \"acl\", \"delete_document\", \"restore_finished\", \"workflow\".",
+            "type": "string"
+          },
+          "id": {
+            "description": "Id of the event.",
+            "format": "int64",
+            "type": "string"
+          },
+          "labels": {
+            "description": "Labels are the labels that were extracted from the last document update.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "language": {
+            "description": "Language of the affected document.",
+            "type": "string"
+          },
+          "mainDocument": {
+            "description": "MainDocument UUID if the document is a metadata document.",
+            "type": "string"
+          },
+          "mainDocumentType": {
+            "description": "MainDocumentType is the type of the main document if the document is a metadata document.",
+            "type": "string"
+          },
+          "oldLanguage": {
+            "description": "OldLanguage of the document if the document changed language.",
+            "type": "string"
+          },
+          "status": {
+            "description": "Status that was affected, if it was a \"status\" event.",
+            "type": "string"
+          },
+          "statusId": {
+            "description": "StatusId is the ID of the created status.",
+            "format": "int64",
+            "type": "string"
+          },
+          "systemState": {
+            "description": "SystemState is set to \"restoring\" if this event was generated from a restore operation. If the event wasn't generated by a special operation it is left empty.",
+            "type": "string"
+          },
+          "timespans": {
+            "description": "Timespans are the timespans that were extracted from the last document update and from the assignment if this document is a deliverable.",
+            "items": {
+              "properties": {
+                "from": {
+                  "type": "string"
+                },
+                "to": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "timestamp": {
+            "description": "Timestamp that the event occurred, as an RFC3339 timestamp.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type of the affected document.",
+            "type": "string"
+          },
+          "updaterUri": {
+            "description": "UpdaterUri is the URI for the subject that performed the update.",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "Uuid of the document that was affected.",
+            "type": "string"
+          },
+          "version": {
+            "description": "Version of the document.",
+            "format": "int64",
+            "type": "string"
+          },
+          "workflowCheckpoint": {
+            "description": "WorkflowCheckpoint that the document reached most recently.",
+            "type": "string"
+          },
+          "workflowState": {
+            "description": "WorkflowState that the document is in.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -525,8 +11878,188 @@ func documentsCompactedEventlogCommand() *cli.Command {
 			&cli.Int64Flag{Name: "limit", Usage: "Limit restricts the number of events we want returned for each call. Together with `offset` this allows us to page through the unique document events between `after` and `until`. Defaults to 0, meaning no limit."},
 			&cli.Int64Flag{Name: "offset", Usage: "Offset allows us to skip N number of events relative to `after`. So while `after` and until allows us to paginate through the log as a whole, `offset` and `limit` allows us to page through the unique document events between `after` and `until`. Defaults to 0, meaning no offset."},
 			&cli.StringFlag{Name: "type", Usage: "Type is used to only return events for documents of the given type. Defaults to empty, which will return events for all document types."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "after": {
+      "description": "After specifies the event ID after which to start returning events.",
+      "format": "int64",
+      "type": "string"
+    },
+    "limit": {
+      "description": "Limit restricts the number of events we want returned for each call. Together with 'offset' this allows us to page through the unique document events between 'after' and 'until'. Defaults to 0, meaning no limit.",
+      "type": "integer"
+    },
+    "offset": {
+      "description": "Offset allows us to skip N number of events relative to 'after'. So while 'after' and until allows us to paginate through the log as a whole, 'offset' and 'limit' allows us to page through the unique document events between 'after' and 'until'. Defaults to 0, meaning no offset.",
+      "type": "integer"
+    },
+    "type": {
+      "description": "Type is used to only return events for documents of the given type. Defaults to empty, which will return events for all document types.",
+      "type": "string"
+    },
+    "until": {
+      "description": "Until allows us to control the number of events we want to evaluate when compacting. Must be between 1 and 10000 more than 'after', and cannot be greater than the current last event.",
+      "format": "int64",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "items": {
+      "items": {
+        "properties": {
+          "acl": {
+            "description": "Acl entry, if it was an \"acl\" event.",
+            "items": {
+              "properties": {
+                "permissions": {
+                  "description": "Permissions given to the grantee.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "uri": {
+                  "description": "URI that identifies the party that's granted access.",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "attachedObjects": {
+            "description": "AttachedObjects contains the object names, f.ex. \"image\" or \"audio\", when when objects (files) were attached together with a document update.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "deleteRecordId": {
+            "description": "DeleteRecordId is the ID of the delete record if this was a delete event.",
+            "format": "int64",
+            "type": "string"
+          },
+          "detachedObjects": {
+            "description": "DetachedObjects contains the object names, f.ex. \"image\" or \"audio\", when when objects (files) were detached in a document update.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "documentNonce": {
+            "description": "DocumentNonce is the unique nonce for this document. If the document is deleted and recreated with the same ID it will still have a unique nonce.",
+            "type": "string"
+          },
+          "event": {
+            "description": "Event type, one of: \"document\", \"status\", \"acl\", \"delete_document\", \"restore_finished\", \"workflow\".",
+            "type": "string"
+          },
+          "id": {
+            "description": "Id of the event.",
+            "format": "int64",
+            "type": "string"
+          },
+          "labels": {
+            "description": "Labels are the labels that were extracted from the last document update.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "language": {
+            "description": "Language of the affected document.",
+            "type": "string"
+          },
+          "mainDocument": {
+            "description": "MainDocument UUID if the document is a metadata document.",
+            "type": "string"
+          },
+          "mainDocumentType": {
+            "description": "MainDocumentType is the type of the main document if the document is a metadata document.",
+            "type": "string"
+          },
+          "oldLanguage": {
+            "description": "OldLanguage of the document if the document changed language.",
+            "type": "string"
+          },
+          "status": {
+            "description": "Status that was affected, if it was a \"status\" event.",
+            "type": "string"
+          },
+          "statusId": {
+            "description": "StatusId is the ID of the created status.",
+            "format": "int64",
+            "type": "string"
+          },
+          "systemState": {
+            "description": "SystemState is set to \"restoring\" if this event was generated from a restore operation. If the event wasn't generated by a special operation it is left empty.",
+            "type": "string"
+          },
+          "timespans": {
+            "description": "Timespans are the timespans that were extracted from the last document update and from the assignment if this document is a deliverable.",
+            "items": {
+              "properties": {
+                "from": {
+                  "type": "string"
+                },
+                "to": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "timestamp": {
+            "description": "Timestamp that the event occurred, as an RFC3339 timestamp.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type of the affected document.",
+            "type": "string"
+          },
+          "updaterUri": {
+            "description": "UpdaterUri is the URI for the subject that performed the update.",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "Uuid of the document that was affected.",
+            "type": "string"
+          },
+          "version": {
+            "description": "Version of the document.",
+            "format": "int64",
+            "type": "string"
+          },
+          "workflowCheckpoint": {
+            "description": "WorkflowCheckpoint that the document reached most recently.",
+            "type": "string"
+          },
+          "workflowState": {
+            "description": "WorkflowState that the document is in.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -565,8 +12098,74 @@ func documentsGetStatusCommand() *cli.Command {
 			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to get the status history for."},
 			&cli.StringFlag{Name: "name", Usage: "Name of the status to get."},
 			&cli.Int64Flag{Name: "id", Usage: "ID of the status to get. Optional, will default to the latest status."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "id": {
+      "description": "ID of the status to get. Optional, will default to the latest status.",
+      "format": "int64",
+      "type": "string"
+    },
+    "name": {
+      "description": "Name of the status to get.",
+      "type": "string"
+    },
+    "uuid": {
+      "description": "UUID of the document to get the status history for.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "status": {
+      "properties": {
+        "created": {
+          "description": "Created timestamp is the RFC3339 timestamp for when the status was created.",
+          "type": "string"
+        },
+        "creator": {
+          "description": "Creator of the status.",
+          "type": "string"
+        },
+        "id": {
+          "description": "ID of the status.",
+          "format": "int64",
+          "type": "string"
+        },
+        "meta": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Meta data for the status.",
+          "type": "object"
+        },
+        "metaDocVersion": {
+          "description": "MetaDocumentVersion is the version the meta document had at the time the status was set.",
+          "format": "int64",
+          "type": "string"
+        },
+        "version": {
+          "description": "Version of the document that the status refers to.",
+          "format": "int64",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -603,8 +12202,77 @@ func documentsGetStatusHistoryCommand() *cli.Command {
 			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to get the status history for."},
 			&cli.StringFlag{Name: "name", Usage: "Name of the status to get."},
 			&cli.Int64Flag{Name: "before", Usage: "Before is a status ID used to page backwards through the status history. If no ID or a zero ID is provided the list will start with the lastest status."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "before": {
+      "description": "Before is a status ID used to page backwards through the status history. If no ID or a zero ID is provided the list will start with the lastest status.",
+      "format": "int64",
+      "type": "string"
+    },
+    "name": {
+      "description": "Name of the status to get.",
+      "type": "string"
+    },
+    "uuid": {
+      "description": "UUID of the document to get the status history for.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "statuses": {
+      "items": {
+        "properties": {
+          "created": {
+            "description": "Created timestamp is the RFC3339 timestamp for when the status was created.",
+            "type": "string"
+          },
+          "creator": {
+            "description": "Creator of the status.",
+            "type": "string"
+          },
+          "id": {
+            "description": "ID of the status.",
+            "format": "int64",
+            "type": "string"
+          },
+          "meta": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Meta data for the status.",
+            "type": "object"
+          },
+          "metaDocVersion": {
+            "description": "MetaDocumentVersion is the version the meta document had at the time the status was set.",
+            "format": "int64",
+            "type": "string"
+          },
+          "version": {
+            "description": "Version of the document that the status refers to.",
+            "format": "int64",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -640,8 +12308,83 @@ func documentsGetNilStatusesCommand() *cli.Command {
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to get the nil statuses for."},
 			&cli.StringSliceFlag{Name: "names", Usage: "Names of statuses to get, optional. Defaults to all statuses."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "names": {
+      "description": "Names of statuses to get, optional. Defaults to all statuses.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "uuid": {
+      "description": "UUID of the document to get the nil statuses for.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "statuses": {
+      "additionalProperties": {
+        "properties": {
+          "items": {
+            "items": {
+              "properties": {
+                "created": {
+                  "description": "Created timestamp is the RFC3339 timestamp for when the status was created.",
+                  "type": "string"
+                },
+                "creator": {
+                  "description": "Creator of the status.",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "ID of the status.",
+                  "format": "int64",
+                  "type": "string"
+                },
+                "meta": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "description": "Meta data for the status.",
+                  "type": "object"
+                },
+                "metaDocVersion": {
+                  "description": "MetaDocumentVersion is the version the meta document had at the time the status was set.",
+                  "format": "int64",
+                  "type": "string"
+                },
+                "version": {
+                  "description": "Version of the document that the status refers to.",
+                  "format": "int64",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -679,8 +12422,120 @@ func documentsGetStatusOverviewCommand() *cli.Command {
 			&cli.StringSliceFlag{Name: "uuids", Usage: "UUIDs to get statuses for."},
 			&cli.StringSliceFlag{Name: "statuses", Usage: "Statuses to return information for. Optional, omit to only return workflow state."},
 			&cli.BoolFlag{Name: "get-meta", Usage: "GetMeta can be used to load any set status metadata."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "getMeta": {
+      "description": "GetMeta can be used to load any set status metadata.",
+      "type": "boolean"
+    },
+    "statuses": {
+      "description": "Statuses to return information for. Optional, omit to only return workflow state.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "uuids": {
+      "description": "UUIDs to get statuses for.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "items": {
+      "items": {
+        "properties": {
+          "creatorUri": {
+            "description": "CreatorURI is the URI of the subject that created the document.",
+            "type": "string"
+          },
+          "heads": {
+            "additionalProperties": {
+              "properties": {
+                "created": {
+                  "description": "Created timestamp is the RFC3339 timestamp for when the status was created.",
+                  "type": "string"
+                },
+                "creator": {
+                  "description": "Creator of the status.",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "ID of the status.",
+                  "format": "int64",
+                  "type": "string"
+                },
+                "meta": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "description": "Meta data for the status.",
+                  "type": "object"
+                },
+                "metaDocVersion": {
+                  "description": "MetaDocumentVersion is the version the meta document had at the time the status was set.",
+                  "format": "int64",
+                  "type": "string"
+                },
+                "version": {
+                  "description": "Version of the document that the status refers to.",
+                  "format": "int64",
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "description": "Heads are the last statuses.",
+            "type": "object"
+          },
+          "modified": {
+            "description": "Modified timestamp is the RFC3339 timestamp for the last change that affected the document.",
+            "type": "string"
+          },
+          "updaterUri": {
+            "description": "UpdaterURI is the URI of the subject that last updated the document.",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "UUID of the document.",
+            "type": "string"
+          },
+          "version": {
+            "description": "Version is the current version (last written version) of the document.",
+            "format": "int64",
+            "type": "string"
+          },
+          "workflowCheckpoint": {
+            "description": "WorkflowCheckpoint that the document reached most recently.",
+            "type": "string"
+          },
+          "workflowState": {
+            "description": "WorkflowState that the document is in.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -719,8 +12574,37 @@ func documentsGetPermissionsCommand() *cli.Command {
 		Usage: "GetPermissions returns the permissions you have for the document.",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to get the permissions for."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "uuid": {
+      "description": "UUID of the document to get the permissions for.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "permissions": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Permissions that the client has for the document. The map is keyed by the permission the client has and the value is either the client subject, the unit URI if the permission was granted through a unit membership, or \"scope://[name]\" if it was granted through elevated privileges.",
+      "type": "object"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -756,8 +12640,50 @@ func documentsLockCommand() *cli.Command {
 			&cli.Int64Flag{Name: "ttl", Usage: "Lock TTL in milliseconds"},
 			&cli.StringFlag{Name: "app", Usage: "Name of the locking application. Optional."},
 			&cli.StringFlag{Name: "comment", Usage: "Free-form comment string. Optional."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "app": {
+      "description": "Name of the locking application. Optional.",
+      "type": "string"
+    },
+    "comment": {
+      "description": "Free-form comment string. Optional.",
+      "type": "string"
+    },
+    "ttl": {
+      "description": "Lock TTL in milliseconds",
+      "type": "integer"
+    },
+    "uuid": {
+      "description": "UUID of the document to lock",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "expires": {
+      "description": "Expires is the RFC3339 timestamp when the lock will expire.",
+      "type": "string"
+    },
+    "token": {
+      "description": "Generated lock token in UUID format.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -795,8 +12721,46 @@ func documentsExtendLockCommand() *cli.Command {
 			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to extend the lock for."},
 			&cli.Int64Flag{Name: "ttl", Usage: "Lock TTL in milliseconds."},
 			&cli.StringFlag{Name: "token", Usage: "Lock token in UUID format."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "token": {
+      "description": "Lock token in UUID format.",
+      "type": "string"
+    },
+    "ttl": {
+      "description": "Lock TTL in milliseconds.",
+      "type": "integer"
+    },
+    "uuid": {
+      "description": "UUID of the document to extend the lock for.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "expires": {
+      "description": "Expires is the RFC3339 timestamp when the lock will expire.",
+      "type": "string"
+    },
+    "token": {
+      "description": "Generated lock token in UUID format.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -832,8 +12796,32 @@ func documentsUnlockCommand() *cli.Command {
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to unlock"},
 			&cli.StringFlag{Name: "token", Usage: "Lock token in UUID format."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "token": {
+      "description": "Lock token in UUID format.",
+      "type": "string"
+    },
+    "uuid": {
+      "description": "UUID of the document to unlock",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -865,8 +12853,66 @@ func documentsGetWithheldCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-withheld",
 		Usage: "GetWithheld returns the next upcoming scheduled publish actions. This is not a complete list, but a list of the next N documents that are considered eligible for publishing.",
-		Flags: append([]cli.Flag{}, fileFlag()...),
+		Flags: append([]cli.Flag{}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "items": {
+      "items": {
+        "properties": {
+          "assignment": {
+            "description": "Assignment ID.",
+            "type": "string"
+          },
+          "documentVersion": {
+            "description": "DocumentVersion is the last version that was set as withheld.",
+            "format": "int64",
+            "type": "string"
+          },
+          "planningItem": {
+            "description": "PlanningItem UUID.",
+            "type": "string"
+          },
+          "publish": {
+            "description": "Publish timestamp as RFC3339 set in the assignment.",
+            "type": "string"
+          },
+          "scheduledBy": {
+            "description": "ScheduledBy is the sub of the user that set the withheld status.",
+            "type": "string"
+          },
+          "statusId": {
+            "description": "StatusID is the last withheld status ID.",
+            "format": "int64",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type of the scheduled document.",
+            "type": "string"
+          },
+          "uuid": {
+            "description": "UUID is the ID of the scheduled document.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -896,8 +12942,46 @@ func documentsGetDeliverableInfoCommand() *cli.Command {
 		Usage: "GetDeliverableInfo returns available information related to the deliverable.",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "uuid", Usage: "UUID of the deliverable."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "uuid": {
+      "description": "UUID of the deliverable.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "assignmentUuid": {
+      "description": "UUID of the related assignment.",
+      "type": "string"
+    },
+    "eventUuid": {
+      "description": "UUID of the related event.",
+      "type": "string"
+    },
+    "hasPlanningInfo": {
+      "description": "Indicates whether the deliverable has planning information.",
+      "type": "boolean"
+    },
+    "planningUuid": {
+      "description": "UUID of the related planning item.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -932,8 +13016,49 @@ func documentsCreateUploadCommand() *cli.Command {
 			&cli.StringFlag{Name: "name", Usage: "Name of the uploaded file, this should be the basename of the file."},
 			&cli.StringFlag{Name: "content-type", Usage: "ContentType is the type of the file as a mimetype."},
 			&cli.StringMapFlag{Name: "meta", Usage: "Meta can be used to set arbitrary key-value data on an upload."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "contentType": {
+      "description": "ContentType is the type of the file as a mimetype.",
+      "type": "string"
+    },
+    "meta": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Meta can be used to set arbitrary key-value data on an upload.",
+      "type": "object"
+    },
+    "name": {
+      "description": "Name of the uploaded file, this should be the basename of the file.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "id": {
+      "description": "ID of the created upload.",
+      "type": "string"
+    },
+    "url": {
+      "description": "URL to PUT the object content to.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -972,8 +13097,74 @@ func documentsGetAttachmentsCommand() *cli.Command {
 			&cli.StringSliceFlag{Name: "documents", Usage: "Documents to get attachments for."},
 			&cli.StringFlag{Name: "attachment-name", Usage: "Attachment name to get information for."},
 			&cli.BoolFlag{Name: "download-link", Usage: "DownloadLink should be set to true to generate a download link."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "attachmentName": {
+      "description": "Attachment name to get information for.",
+      "type": "string"
+    },
+    "documents": {
+      "description": "Documents to get attachments for.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "downloadLink": {
+      "description": "DownloadLink should be set to true to generate a download link.",
+      "type": "boolean"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "attachments": {
+      "items": {
+        "properties": {
+          "contentType": {
+            "description": "ContentType is the MIME type of the object.",
+            "type": "string"
+          },
+          "document": {
+            "description": "Document is the UUID of the document the object is attached to.",
+            "type": "string"
+          },
+          "downloadLink": {
+            "description": "DownloadLink that can be used to fetch the object contents, if requested.",
+            "type": "string"
+          },
+          "filename": {
+            "description": "Filename is the name of the file the object represents.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name of the attachment.",
+            "type": "string"
+          },
+          "version": {
+            "description": "Version of the attachment.",
+            "format": "int64",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -1008,8 +13199,1640 @@ func documentsGetMatchingCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-matching",
 		Usage: "GetMatching returns documents matching the given criteria.",
-		Flags: fileFlag(),
+		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "filter": {
+      "description": "Filter to apply to the documents.",
+      "properties": {
+        "and": {
+          "description": "And filters that all must be true.",
+          "items": {
+            "properties": {
+              "and": {
+                "description": "And filters that all must be true.",
+                "items": {
+                  "properties": {
+                    "and": {
+                      "description": "And filters that all must be true.",
+                      "items": {
+                        "properties": {
+                          "and": {
+                            "description": "And filters that all must be true.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "expression": {
+                            "description": "Expression used to extract values from the document.",
+                            "type": "string"
+                          },
+                          "operator": {
+                            "description": "Operator to use when comparing the provided values to the extracted values.",
+                            "enum": [
+                              "FILTER_OP_UNKNOWN",
+                              "FILTER_OP_ANY",
+                              "FILTER_OP_ALL",
+                              "FILTER_OP_NONE"
+                            ],
+                            "type": "string"
+                          },
+                          "or": {
+                            "description": "Or filters of which at least one must be true.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "values": {
+                            "description": "Values to compare to the extracted values.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "expression": {
+                      "description": "Expression used to extract values from the document.",
+                      "type": "string"
+                    },
+                    "operator": {
+                      "description": "Operator to use when comparing the provided values to the extracted values.",
+                      "enum": [
+                        "FILTER_OP_UNKNOWN",
+                        "FILTER_OP_ANY",
+                        "FILTER_OP_ALL",
+                        "FILTER_OP_NONE"
+                      ],
+                      "type": "string"
+                    },
+                    "or": {
+                      "description": "Or filters of which at least one must be true.",
+                      "items": {
+                        "properties": {
+                          "and": {
+                            "description": "And filters that all must be true.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "expression": {
+                            "description": "Expression used to extract values from the document.",
+                            "type": "string"
+                          },
+                          "operator": {
+                            "description": "Operator to use when comparing the provided values to the extracted values.",
+                            "enum": [
+                              "FILTER_OP_UNKNOWN",
+                              "FILTER_OP_ANY",
+                              "FILTER_OP_ALL",
+                              "FILTER_OP_NONE"
+                            ],
+                            "type": "string"
+                          },
+                          "or": {
+                            "description": "Or filters of which at least one must be true.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "values": {
+                            "description": "Values to compare to the extracted values.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "values": {
+                      "description": "Values to compare to the extracted values.",
+                      "items": {
+                        "properties": {
+                          "values": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "expression": {
+                "description": "Expression used to extract values from the document.",
+                "type": "string"
+              },
+              "operator": {
+                "description": "Operator to use when comparing the provided values to the extracted values.",
+                "enum": [
+                  "FILTER_OP_UNKNOWN",
+                  "FILTER_OP_ANY",
+                  "FILTER_OP_ALL",
+                  "FILTER_OP_NONE"
+                ],
+                "type": "string"
+              },
+              "or": {
+                "description": "Or filters of which at least one must be true.",
+                "items": {
+                  "properties": {
+                    "and": {
+                      "description": "And filters that all must be true.",
+                      "items": {
+                        "properties": {
+                          "and": {
+                            "description": "And filters that all must be true.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "expression": {
+                            "description": "Expression used to extract values from the document.",
+                            "type": "string"
+                          },
+                          "operator": {
+                            "description": "Operator to use when comparing the provided values to the extracted values.",
+                            "enum": [
+                              "FILTER_OP_UNKNOWN",
+                              "FILTER_OP_ANY",
+                              "FILTER_OP_ALL",
+                              "FILTER_OP_NONE"
+                            ],
+                            "type": "string"
+                          },
+                          "or": {
+                            "description": "Or filters of which at least one must be true.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "values": {
+                            "description": "Values to compare to the extracted values.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "expression": {
+                      "description": "Expression used to extract values from the document.",
+                      "type": "string"
+                    },
+                    "operator": {
+                      "description": "Operator to use when comparing the provided values to the extracted values.",
+                      "enum": [
+                        "FILTER_OP_UNKNOWN",
+                        "FILTER_OP_ANY",
+                        "FILTER_OP_ALL",
+                        "FILTER_OP_NONE"
+                      ],
+                      "type": "string"
+                    },
+                    "or": {
+                      "description": "Or filters of which at least one must be true.",
+                      "items": {
+                        "properties": {
+                          "and": {
+                            "description": "And filters that all must be true.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "expression": {
+                            "description": "Expression used to extract values from the document.",
+                            "type": "string"
+                          },
+                          "operator": {
+                            "description": "Operator to use when comparing the provided values to the extracted values.",
+                            "enum": [
+                              "FILTER_OP_UNKNOWN",
+                              "FILTER_OP_ANY",
+                              "FILTER_OP_ALL",
+                              "FILTER_OP_NONE"
+                            ],
+                            "type": "string"
+                          },
+                          "or": {
+                            "description": "Or filters of which at least one must be true.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "values": {
+                            "description": "Values to compare to the extracted values.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "values": {
+                      "description": "Values to compare to the extracted values.",
+                      "items": {
+                        "properties": {
+                          "values": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "values": {
+                "description": "Values to compare to the extracted values.",
+                "items": {
+                  "properties": {
+                    "values": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "expression": {
+          "description": "Expression used to extract values from the document.",
+          "type": "string"
+        },
+        "operator": {
+          "description": "Operator to use when comparing the provided values to the extracted values.",
+          "enum": [
+            "FILTER_OP_UNKNOWN",
+            "FILTER_OP_ANY",
+            "FILTER_OP_ALL",
+            "FILTER_OP_NONE"
+          ],
+          "type": "string"
+        },
+        "or": {
+          "description": "Or filters of which at least one must be true.",
+          "items": {
+            "properties": {
+              "and": {
+                "description": "And filters that all must be true.",
+                "items": {
+                  "properties": {
+                    "and": {
+                      "description": "And filters that all must be true.",
+                      "items": {
+                        "properties": {
+                          "and": {
+                            "description": "And filters that all must be true.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "expression": {
+                            "description": "Expression used to extract values from the document.",
+                            "type": "string"
+                          },
+                          "operator": {
+                            "description": "Operator to use when comparing the provided values to the extracted values.",
+                            "enum": [
+                              "FILTER_OP_UNKNOWN",
+                              "FILTER_OP_ANY",
+                              "FILTER_OP_ALL",
+                              "FILTER_OP_NONE"
+                            ],
+                            "type": "string"
+                          },
+                          "or": {
+                            "description": "Or filters of which at least one must be true.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "values": {
+                            "description": "Values to compare to the extracted values.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "expression": {
+                      "description": "Expression used to extract values from the document.",
+                      "type": "string"
+                    },
+                    "operator": {
+                      "description": "Operator to use when comparing the provided values to the extracted values.",
+                      "enum": [
+                        "FILTER_OP_UNKNOWN",
+                        "FILTER_OP_ANY",
+                        "FILTER_OP_ALL",
+                        "FILTER_OP_NONE"
+                      ],
+                      "type": "string"
+                    },
+                    "or": {
+                      "description": "Or filters of which at least one must be true.",
+                      "items": {
+                        "properties": {
+                          "and": {
+                            "description": "And filters that all must be true.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "expression": {
+                            "description": "Expression used to extract values from the document.",
+                            "type": "string"
+                          },
+                          "operator": {
+                            "description": "Operator to use when comparing the provided values to the extracted values.",
+                            "enum": [
+                              "FILTER_OP_UNKNOWN",
+                              "FILTER_OP_ANY",
+                              "FILTER_OP_ALL",
+                              "FILTER_OP_NONE"
+                            ],
+                            "type": "string"
+                          },
+                          "or": {
+                            "description": "Or filters of which at least one must be true.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "values": {
+                            "description": "Values to compare to the extracted values.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "values": {
+                      "description": "Values to compare to the extracted values.",
+                      "items": {
+                        "properties": {
+                          "values": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "expression": {
+                "description": "Expression used to extract values from the document.",
+                "type": "string"
+              },
+              "operator": {
+                "description": "Operator to use when comparing the provided values to the extracted values.",
+                "enum": [
+                  "FILTER_OP_UNKNOWN",
+                  "FILTER_OP_ANY",
+                  "FILTER_OP_ALL",
+                  "FILTER_OP_NONE"
+                ],
+                "type": "string"
+              },
+              "or": {
+                "description": "Or filters of which at least one must be true.",
+                "items": {
+                  "properties": {
+                    "and": {
+                      "description": "And filters that all must be true.",
+                      "items": {
+                        "properties": {
+                          "and": {
+                            "description": "And filters that all must be true.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "expression": {
+                            "description": "Expression used to extract values from the document.",
+                            "type": "string"
+                          },
+                          "operator": {
+                            "description": "Operator to use when comparing the provided values to the extracted values.",
+                            "enum": [
+                              "FILTER_OP_UNKNOWN",
+                              "FILTER_OP_ANY",
+                              "FILTER_OP_ALL",
+                              "FILTER_OP_NONE"
+                            ],
+                            "type": "string"
+                          },
+                          "or": {
+                            "description": "Or filters of which at least one must be true.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "values": {
+                            "description": "Values to compare to the extracted values.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "expression": {
+                      "description": "Expression used to extract values from the document.",
+                      "type": "string"
+                    },
+                    "operator": {
+                      "description": "Operator to use when comparing the provided values to the extracted values.",
+                      "enum": [
+                        "FILTER_OP_UNKNOWN",
+                        "FILTER_OP_ANY",
+                        "FILTER_OP_ALL",
+                        "FILTER_OP_NONE"
+                      ],
+                      "type": "string"
+                    },
+                    "or": {
+                      "description": "Or filters of which at least one must be true.",
+                      "items": {
+                        "properties": {
+                          "and": {
+                            "description": "And filters that all must be true.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "expression": {
+                            "description": "Expression used to extract values from the document.",
+                            "type": "string"
+                          },
+                          "operator": {
+                            "description": "Operator to use when comparing the provided values to the extracted values.",
+                            "enum": [
+                              "FILTER_OP_UNKNOWN",
+                              "FILTER_OP_ANY",
+                              "FILTER_OP_ALL",
+                              "FILTER_OP_NONE"
+                            ],
+                            "type": "string"
+                          },
+                          "or": {
+                            "description": "Or filters of which at least one must be true.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "values": {
+                            "description": "Values to compare to the extracted values.",
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "values": {
+                      "description": "Values to compare to the extracted values.",
+                      "items": {
+                        "properties": {
+                          "values": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "values": {
+                "description": "Values to compare to the extracted values.",
+                "items": {
+                  "properties": {
+                    "values": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "values": {
+          "description": "Values to compare to the extracted values.",
+          "items": {
+            "properties": {
+              "values": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "include": {
+      "description": "Include will include documents with an UUID that matches the uuid of the newdoc extraction expression. Timespans, labels and filters will not be applied to included documents.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "includeDocuments": {
+      "description": "IncludeDocuments should be set to true to get the document for each match.",
+      "type": "boolean"
+    },
+    "includeMeta": {
+      "description": "IncludeMeta should be set to true to include document meta.",
+      "type": "boolean"
+    },
+    "labels": {
+      "description": "Labels is a list of labels that the document must have to be included.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "timespan": {
+      "description": "Timespan is the inclusive time range to get documents for. Optional, this is only available for document types with time expressions and/or deliverables.",
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "type": {
+      "description": "Type of the documents to get.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "matches": {
+      "items": {
+        "properties": {
+          "document": {
+            "description": "Document for the match.",
+            "properties": {
+              "content": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "language": {
+                "type": "string"
+              },
+              "links": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "meta": {
+                "items": {
+                  "properties": {
+                    "content": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "contenttype": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "links": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "meta": {
+                      "items": {
+                        "properties": {
+                          "content": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contenttype": {
+                            "type": "string"
+                          },
+                          "data": {
+                            "additionalProperties": {
+                              "type": "string"
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "links": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "meta": {
+                            "items": {
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "rel": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          },
+                          "sensitivity": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "uri": {
+                            "type": "string"
+                          },
+                          "url": {
+                            "type": "string"
+                          },
+                          "uuid": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rel": {
+                      "type": "string"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "sensitivity": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "uri": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "uuid": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "title": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "uri": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "uuid": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "meta": {
+            "description": "Meta information for the match.",
+            "properties": {
+              "acl": {
+                "description": "ACL is an ACL list controlling access to the document.",
+                "items": {
+                  "properties": {
+                    "permissions": {
+                      "description": "Permissions given to the grantee.",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "uri": {
+                      "description": "URI that identifies the party that's granted access.",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "attachments": {
+                "description": "Attachments are the names of the attached objects (files) for a document.",
+                "items": {
+                  "properties": {
+                    "name": {
+                      "description": "Name of the attachment.",
+                      "type": "string"
+                    },
+                    "version": {
+                      "description": "Version is the current version of the attachment.",
+                      "format": "int64",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "created": {
+                "description": "Created timestamp is the RFC3339 timestamp for when the document was created.",
+                "type": "string"
+              },
+              "creatorUri": {
+                "description": "CreatorURI is the identity of the party that created the document.",
+                "type": "string"
+              },
+              "currentVersion": {
+                "description": "CurrentVersion is the last written version of the document.",
+                "format": "int64",
+                "type": "string"
+              },
+              "heads": {
+                "additionalProperties": {
+                  "properties": {
+                    "created": {
+                      "description": "Created timestamp is the RFC3339 timestamp for when the status was created.",
+                      "type": "string"
+                    },
+                    "creator": {
+                      "description": "Creator of the status.",
+                      "type": "string"
+                    },
+                    "id": {
+                      "description": "ID of the status.",
+                      "format": "int64",
+                      "type": "string"
+                    },
+                    "meta": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "description": "Meta data for the status.",
+                      "type": "object"
+                    },
+                    "metaDocVersion": {
+                      "description": "MetaDocumentVersion is the version the meta document had at the time the status was set.",
+                      "format": "int64",
+                      "type": "string"
+                    },
+                    "version": {
+                      "description": "Version of the document that the status refers to.",
+                      "format": "int64",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "description": "Heads are the last statuses.",
+                "type": "object"
+              },
+              "isMetaDocument": {
+                "description": "IsMetaDocument is true if the document is a meta document.",
+                "type": "boolean"
+              },
+              "lock": {
+                "description": "Document lock, if any",
+                "properties": {
+                  "app": {
+                    "description": "URI identifying the locking application.",
+                    "type": "string"
+                  },
+                  "comment": {
+                    "description": "Optional free-form comment.",
+                    "type": "string"
+                  },
+                  "created": {
+                    "description": "Created timestamp is the RFC3339 timestamp for when the lock was created.",
+                    "type": "string"
+                  },
+                  "expires": {
+                    "description": "Expires timestamp is the RFC3339 timestamp for when the lock will expire.",
+                    "type": "string"
+                  },
+                  "token": {
+                    "description": "Lock token string",
+                    "type": "string"
+                  },
+                  "uri": {
+                    "description": "URI of the lock owner",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "mainDocument": {
+                "description": "MainDocument is the UUID of the main document if this is a meta document.",
+                "type": "string"
+              },
+              "modified": {
+                "description": "Modified timestamp is the RFC3339 timestamp for the last change that affected the document.",
+                "type": "string"
+              },
+              "nonce": {
+                "description": "Nonce is the unique nonce for this document. If the document is deleted and recreated with the same ID it will still have a unique nonce.",
+                "type": "string"
+              },
+              "type": {
+                "description": "Type is the type of the document.",
+                "type": "string"
+              },
+              "updaterUri": {
+                "description": "UpdaterURI is the identity of the party that last updated the document.",
+                "type": "string"
+              },
+              "workflowCheckpoint": {
+                "description": "WorkflowCheckpoint that the document reached most recently.",
+                "type": "string"
+              },
+              "workflowState": {
+                "description": "WorkflowState that the document is in.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "uuid": {
+            "description": "UUID of the document.",
+            "type": "string"
+          },
+          "version": {
+            "description": "Version of the document.",
+            "format": "int64",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -1037,8 +14860,32 @@ func documentsGetSocketTokenCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-socket-token",
 		Usage: "GetSocketToken returns a token that can be used to open socket connections.",
-		Flags: append([]cli.Flag{}, fileFlag()...),
+		Flags: append([]cli.Flag{}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "expires": {
+      "description": "Expires is the expiry time of the token as a RFC3339 timestamp.",
+      "type": "string"
+    },
+    "token": {
+      "description": "Token that is unique for the calling user that can be used to open websocket API connections.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err

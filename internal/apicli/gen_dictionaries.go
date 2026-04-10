@@ -29,8 +29,37 @@ func dictionariesSupportedLanguagesCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "supported-languages",
 		Usage: "SupportedLanguages returns a list of supported languages.",
-		Flags: append([]cli.Flag{}, fileFlag()...),
+		Flags: append([]cli.Flag{}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "languages": {
+      "description": "Languages that can be used for spellchecking.",
+      "items": {
+        "properties": {
+          "code": {
+            "description": "Code for the language.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "spell")
 			if err != nil {
 				return err
@@ -58,8 +87,41 @@ func dictionariesListDictionariesCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "list-dictionaries",
 		Usage: "ListDictionaries lists the currently available custom dictionaries.",
-		Flags: append([]cli.Flag{}, fileFlag()...),
+		Flags: append([]cli.Flag{}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "dictionaries": {
+      "items": {
+        "properties": {
+          "entryCount": {
+            "description": "EntryCount for the dictionary.",
+            "format": "int64",
+            "type": "string"
+          },
+          "language": {
+            "description": "Language the dictionary is for.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "spell")
 			if err != nil {
 				return err
@@ -92,8 +154,90 @@ func dictionariesListEntriesCommand() *cli.Command {
 			&cli.Int64Flag{Name: "page", Usage: "Page to return."},
 			&cli.StringFlag{Name: "prefix", Usage: "Prefix to filter entries by."},
 			&cli.StringFlag{Name: "status", Usage: "Status to filter entries by"},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "language": {
+      "description": "Language to list entries for.",
+      "type": "string"
+    },
+    "page": {
+      "description": "Page to return.",
+      "format": "int64",
+      "type": "string"
+    },
+    "prefix": {
+      "description": "Prefix to filter entries by.",
+      "type": "string"
+    },
+    "status": {
+      "description": "Status to filter entries by",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "entries": {
+      "items": {
+        "properties": {
+          "commonMistakes": {
+            "description": "CommonMistakes when writing the word or phrase. This is used to pre-filter text that is spell-checked.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "description": {
+            "description": "Description of the entry.",
+            "type": "string"
+          },
+          "forms": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Forms is an alternative to the common mistakes -\u003e text pairing and allows the mapping of different forms of the word or phrase to specific replacements.",
+            "type": "object"
+          },
+          "language": {
+            "description": "Language the entry is for.",
+            "type": "string"
+          },
+          "level": {
+            "description": "Level to use when offering corrections based on this entry. Optional, defaults to LEVEL_ERROR.",
+            "enum": [
+              "LEVEL_UNSPECIFIED",
+              "LEVEL_ERROR",
+              "LEVEL_SUGGESTION"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "description": "Status of the entry, this is used for moderation.",
+            "type": "string"
+          },
+          "text": {
+            "description": "Text is the word (or phrase) itself.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "spell")
 			if err != nil {
 				return err
@@ -130,8 +274,79 @@ func dictionariesGetEntryCommand() *cli.Command {
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "language", Usage: "Language the entry is for."},
 			&cli.StringFlag{Name: "text", Usage: "Text is the word or phrase to get the entry for."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "language": {
+      "description": "Language the entry is for.",
+      "type": "string"
+    },
+    "text": {
+      "description": "Text is the word or phrase to get the entry for.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "entry": {
+      "description": "Entry information.",
+      "properties": {
+        "commonMistakes": {
+          "description": "CommonMistakes when writing the word or phrase. This is used to pre-filter text that is spell-checked.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "description": {
+          "description": "Description of the entry.",
+          "type": "string"
+        },
+        "forms": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Forms is an alternative to the common mistakes -\u003e text pairing and allows the mapping of different forms of the word or phrase to specific replacements.",
+          "type": "object"
+        },
+        "language": {
+          "description": "Language the entry is for.",
+          "type": "string"
+        },
+        "level": {
+          "description": "Level to use when offering corrections based on this entry. Optional, defaults to LEVEL_ERROR.",
+          "enum": [
+            "LEVEL_UNSPECIFIED",
+            "LEVEL_ERROR",
+            "LEVEL_SUGGESTION"
+          ],
+          "type": "string"
+        },
+        "status": {
+          "description": "Status of the entry, this is used for moderation.",
+          "type": "string"
+        },
+        "text": {
+          "description": "Text is the word (or phrase) itself.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "spell")
 			if err != nil {
 				return err
@@ -163,8 +378,69 @@ func dictionariesSetEntryCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "set-entry",
 		Usage: "SetEntry is used to add or update custom dictionary entries.",
-		Flags: fileFlag(),
+		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "entry": {
+      "description": "Entry to set.",
+      "properties": {
+        "commonMistakes": {
+          "description": "CommonMistakes when writing the word or phrase. This is used to pre-filter text that is spell-checked.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "description": {
+          "description": "Description of the entry.",
+          "type": "string"
+        },
+        "forms": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Forms is an alternative to the common mistakes -\u003e text pairing and allows the mapping of different forms of the word or phrase to specific replacements.",
+          "type": "object"
+        },
+        "language": {
+          "description": "Language the entry is for.",
+          "type": "string"
+        },
+        "level": {
+          "description": "Level to use when offering corrections based on this entry. Optional, defaults to LEVEL_ERROR.",
+          "enum": [
+            "LEVEL_UNSPECIFIED",
+            "LEVEL_ERROR",
+            "LEVEL_SUGGESTION"
+          ],
+          "type": "string"
+        },
+        "status": {
+          "description": "Status of the entry, this is used for moderation.",
+          "type": "string"
+        },
+        "text": {
+          "description": "Text is the word (or phrase) itself.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "spell")
 			if err != nil {
 				return err
@@ -195,8 +471,32 @@ func dictionariesDeleteEntryCommand() *cli.Command {
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "language", Usage: "Language the entry is for."},
 			&cli.StringFlag{Name: "text", Usage: "Text is the word or phrase to delete."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "language": {
+      "description": "Language the entry is for.",
+      "type": "string"
+    },
+    "text": {
+      "description": "Text is the word or phrase to delete.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "spell")
 			if err != nil {
 				return err

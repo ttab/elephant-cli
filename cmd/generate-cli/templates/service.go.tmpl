@@ -31,8 +31,18 @@ func {{$.FuncPrefix}}{{.GoName}}Command() *cli.Command {
 			{{- range .Fields}}{{if .FlagEligible}}
 			{{.FlagDef}},
 			{{- end}}{{end}}
-		}, fileFlag()...){{else}}fileFlag(){{end}},
+		}, methodFlags()...){{else}}methodFlags(){{end}},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println({{backtickLit .ReqSchema}})
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println({{backtickLit .ResSchema}})
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "{{$.Endpoint}}")
 			if err != nil {
 				return err

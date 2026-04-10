@@ -35,8 +35,36 @@ func workflowsUpdateStatusCommand() *cli.Command {
 			&cli.StringFlag{Name: "type", Usage: "Type that the status is valid for."},
 			&cli.StringFlag{Name: "name", Usage: "Name of the status."},
 			&cli.BoolFlag{Name: "disabled", Usage: "Disabled disables the status so that it cannot be used when setting new statuses."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "disabled": {
+      "description": "Disabled disables the status so that it cannot be used when setting new statuses.",
+      "type": "boolean"
+    },
+    "name": {
+      "description": "Name of the status.",
+      "type": "string"
+    },
+    "type": {
+      "description": "Type that the status is valid for.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -71,8 +99,44 @@ func workflowsGetStatusesCommand() *cli.Command {
 		Usage: "GetStatuses lists all enabled statuses.",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "type", Usage: "Type of documents to get statuses from."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "type": {
+      "description": "Type of documents to get statuses from.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "statuses": {
+      "items": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -103,8 +167,56 @@ func workflowsCreateStatusRuleCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "create-status-rule",
 		Usage: "CreateStatusRule creates or updates a status rule that should be applied when setting statuses.",
-		Flags: fileFlag(),
+		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "rule": {
+      "properties": {
+        "accessRule": {
+          "description": "AccessRule whether this rule acts as access control.",
+          "type": "boolean"
+        },
+        "appliesTo": {
+          "description": "AppliesTo is a list of statuses that this rule applies to.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "description": {
+          "description": "Description of the rule.",
+          "type": "string"
+        },
+        "expression": {
+          "description": "Expression that is evaluated for the rule.",
+          "type": "string"
+        },
+        "name": {
+          "description": "Name of the rule.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Type that the status rule applies to.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -135,8 +247,30 @@ func workflowsDeleteStatusRuleCommand() *cli.Command {
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "type"},
 			&cli.StringFlag{Name: "name"},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -168,8 +302,59 @@ func workflowsGetStatusRulesCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-status-rules",
 		Usage: "GetStatusRules returns all status rules.",
-		Flags: append([]cli.Flag{}, fileFlag()...),
+		Flags: append([]cli.Flag{}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "rules": {
+      "items": {
+        "properties": {
+          "accessRule": {
+            "description": "AccessRule whether this rule acts as access control.",
+            "type": "boolean"
+          },
+          "appliesTo": {
+            "description": "AppliesTo is a list of statuses that this rule applies to.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "description": {
+            "description": "Description of the rule.",
+            "type": "string"
+          },
+          "expression": {
+            "description": "Expression that is evaluated for the rule.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name of the rule.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type that the status rule applies to.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -197,8 +382,53 @@ func workflowsSetWorkflowCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "set-workflow",
 		Usage: "SetWorkflow configures a workflow for a document type.",
-		Flags: fileFlag(),
+		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "type": {
+      "description": "Type of the document that this workflow is for.",
+      "type": "string"
+    },
+    "workflow": {
+      "description": "Workflow declaration.",
+      "properties": {
+        "checkpoint": {
+          "description": "Checkpoint is the status that should be used as the state checkpoint.",
+          "type": "string"
+        },
+        "negativeCheckpoint": {
+          "description": "NegativeCheckpoint is the state that should be used when the checkpoint status is set using a negative version.",
+          "type": "string"
+        },
+        "stepZero": {
+          "description": "StepZero is the step that the state begins in, or reverts to after a checkpoint.",
+          "type": "string"
+        },
+        "steps": {
+          "description": "Steps are the names of statuses that should be used as steps between checkpoints.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -228,8 +458,63 @@ func workflowsGetWorkflowCommand() *cli.Command {
 		Usage: "GetWorkflow for a document type.",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "type", Usage: "Type of the document to get workflow for."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "type": {
+      "description": "Type of the document to get workflow for.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "updated": {
+      "description": "Updated is the update time as a RFC3339 timestamp.",
+      "type": "string"
+    },
+    "updaterUri": {
+      "description": "UpdaterURI identifies the user that last updated the workflow.",
+      "type": "string"
+    },
+    "workflow": {
+      "description": "Workflow declaration.",
+      "properties": {
+        "checkpoint": {
+          "description": "Checkpoint is the status that should be used as the state checkpoint.",
+          "type": "string"
+        },
+        "negativeCheckpoint": {
+          "description": "NegativeCheckpoint is the state that should be used when the checkpoint status is set using a negative version.",
+          "type": "string"
+        },
+        "stepZero": {
+          "description": "StepZero is the step that the state begins in, or reverts to after a checkpoint.",
+          "type": "string"
+        },
+        "steps": {
+          "description": "Steps are the names of statuses that should be used as steps between checkpoints.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
@@ -262,8 +547,28 @@ func workflowsDeleteWorkflowCommand() *cli.Command {
 		Usage: "DeleteWorkflow removes the workflow configuration for a document type.",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "type", Usage: "Type of the document to remove the workflow for."},
-		}, fileFlag()...),
+		}, methodFlags()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "properties": {
+    "type": {
+      "description": "Type of the document to remove the workflow for.",
+      "type": "string"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
 			if err != nil {
 				return err
