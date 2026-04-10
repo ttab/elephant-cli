@@ -21,6 +21,11 @@ import (
 	_ "github.com/ttab/elephant-api/repository"
 	_ "github.com/ttab/elephant-api/spell"
 	_ "github.com/ttab/elephant-api/user"
+	_ "github.com/ttab/elephant-tt-api/baboon"
+	_ "github.com/ttab/elephant-tt-api/eidos"
+	_ "github.com/ttab/elephant-tt-api/everysport"
+	_ "github.com/ttab/elephant-tt-api/ntb"
+	_ "github.com/ttab/elephant-tt-api/wires"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/reflect/protoregistry"
 )
@@ -29,6 +34,7 @@ import (
 var templateFS embed.FS
 
 type serviceConfig struct {
+	modulePath   string
 	protoFile    string
 	goImportPath string
 	goAlias      string
@@ -37,34 +43,74 @@ type serviceConfig struct {
 
 var serviceConfigs = []serviceConfig{
 	{
+		modulePath:   "github.com/ttab/elephant-api",
 		protoFile:    "repository/service.proto",
 		goImportPath: "github.com/ttab/elephant-api/repository",
 		goAlias:      "repository",
 		endpoint:     "repository",
 	},
 	{
+		modulePath:   "github.com/ttab/elephant-api",
 		protoFile:    "index/service.proto",
 		goImportPath: "github.com/ttab/elephant-api/index",
 		goAlias:      "index",
 		endpoint:     "index",
 	},
 	{
+		modulePath:   "github.com/ttab/elephant-api",
 		protoFile:    "user/service.proto",
 		goImportPath: "github.com/ttab/elephant-api/user",
 		goAlias:      "user",
 		endpoint:     "user",
 	},
 	{
+		modulePath:   "github.com/ttab/elephant-api",
 		protoFile:    "spell/service.proto",
 		goImportPath: "github.com/ttab/elephant-api/spell",
 		goAlias:      "spell",
 		endpoint:     "spell",
 	},
 	{
+		modulePath:   "github.com/ttab/elephant-api",
 		protoFile:    "replicant/service.proto",
 		goImportPath: "github.com/ttab/elephant-api/replicant",
 		goAlias:      "replicant",
 		endpoint:     "replicant",
+	},
+	{
+		modulePath:   "github.com/ttab/elephant-tt-api",
+		protoFile:    "baboon/service.proto",
+		goImportPath: "github.com/ttab/elephant-tt-api/baboon",
+		goAlias:      "baboon",
+		endpoint:     "baboon",
+	},
+	{
+		modulePath:   "github.com/ttab/elephant-tt-api",
+		protoFile:    "eidos/service.proto",
+		goImportPath: "github.com/ttab/elephant-tt-api/eidos",
+		goAlias:      "eidos",
+		endpoint:     "eidos2",
+	},
+	{
+		modulePath:   "github.com/ttab/elephant-tt-api",
+		protoFile:    "everysport/service.proto",
+		goImportPath: "github.com/ttab/elephant-tt-api/everysport",
+		goAlias:      "everysport",
+		endpoint:     "everysport",
+	},
+	{
+		modulePath:   "github.com/ttab/elephant-tt-api",
+		protoFile:    "ntb/service.proto",
+		goImportPath: "github.com/ttab/elephant-tt-api/ntb",
+		goAlias:      "ntb",
+		endpoint:     "ntb",
+	},
+	{
+		modulePath:   "github.com/ttab/elephant-tt-api",
+		protoFile:    "wires/service.proto",
+		goImportPath: "github.com/ttab/elephant-tt-api/wires",
+		goAlias:      "wires",
+		endpoint:     "wires",
 	},
 }
 
@@ -123,10 +169,21 @@ func main() {
 		os.Exit(1)
 	}
 
-	apiDir, err := findModuleDir("github.com/ttab/elephant-api")
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "find elephant-api module: %v\n", err)
-		os.Exit(1)
+	moduleDirs := make(map[string]string)
+
+	for _, cfg := range serviceConfigs {
+		if moduleDirs[cfg.modulePath] != "" {
+			continue
+		}
+
+		dir, err := findModuleDir(cfg.modulePath)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "find module %s: %v\n",
+				cfg.modulePath, err)
+			os.Exit(1)
+		}
+
+		moduleDirs[cfg.modulePath] = dir
 	}
 
 	var allServices []serviceTmplData
@@ -138,7 +195,9 @@ func main() {
 			os.Exit(1)
 		}
 
-		comments, err := parseProtoComments(filepath.Join(apiDir, cfg.protoFile))
+		modDir := moduleDirs[cfg.modulePath]
+
+		comments, err := parseProtoComments(filepath.Join(modDir, cfg.protoFile))
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "parse proto comments %s: %v\n", cfg.protoFile, err)
 			os.Exit(1)

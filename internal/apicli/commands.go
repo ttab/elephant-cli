@@ -18,5 +18,13 @@ func AllServiceCommands() []*cli.Command {
 		checkServiceCommand(),
 		dictionariesServiceCommand(),
 		replicationServiceCommand(),
+		assetsServiceCommand(),
+		printServiceCommand(),
+		taggerServiceCommand(),
+		manageServiceCommand(),
+		metadataServiceCommand(),
+		mediaServiceCommand(),
+		nynorskServiceCommand(),
+		rssFeedServiceCommand(),
 	}
 }

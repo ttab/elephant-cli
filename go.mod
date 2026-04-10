@@ -56,6 +56,7 @@ require (
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/segmentio/asm v1.1.3 // indirect
 	github.com/segmentio/encoding v0.5.4 // indirect
+	github.com/ttab/elephant-tt-api v0.5.0 // indirect
 	github.com/ttab/newsdoc v1.0.0 // indirect
 	github.com/ttab/revisor v0.11.2 // indirect
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
