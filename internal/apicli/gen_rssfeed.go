@@ -12,8 +12,8 @@ import (
 
 func rssFeedServiceCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "rss-feed",
-		Usage: "RssFeed service commands",
+		Name:  "wires.rss-feed",
+		Usage: "wires.RssFeed service commands",
 		Commands: []*cli.Command{
 			rssFeedGetAllFeedsCommand(),
 			rssFeedUpdateFeedCommand(),
@@ -25,7 +25,7 @@ func rssFeedServiceCommand() *cli.Command {
 func rssFeedGetAllFeedsCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-all-feeds",
-		Usage: "Call RssFeed.GetAllFeeds",
+		Usage: "Call wires.RssFeed.GetAllFeeds",
 		Flags: append([]cli.Flag{
 			&cli.Int64Flag{Name: "page", Usage: "The page number to retrieve. Defaults to 0 if not specified, representing the first page."},
 			&cli.Int64Flag{Name: "page-size", Usage: "The number of items to include in each page of results. Defaults to 10 if not specified."},
@@ -168,7 +168,7 @@ func rssFeedGetAllFeedsCommand() *cli.Command {
 func rssFeedUpdateFeedCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "update-feed",
-		Usage: "Call RssFeed.UpdateFeed",
+		Usage: "Call wires.RssFeed.UpdateFeed",
 		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			if cmd.Bool("req-schema") {
@@ -279,7 +279,7 @@ func rssFeedUpdateFeedCommand() *cli.Command {
 func rssFeedDeleteFeedCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "delete-feed",
-		Usage: "Call RssFeed.DeleteFeed",
+		Usage: "Call wires.RssFeed.DeleteFeed",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "uuid", Usage: "UUIDv5 of the feed, created by using the url."},
 		}, methodFlags()...),

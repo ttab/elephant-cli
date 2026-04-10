@@ -12,8 +12,8 @@ import (
 
 func metricsServiceCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "metrics",
-		Usage: "Metrics service commands",
+		Name:  "repository.metrics",
+		Usage: "repository.Metrics service commands",
 		Commands: []*cli.Command{
 			metricsRegisterKindCommand(),
 			metricsDeleteKindCommand(),

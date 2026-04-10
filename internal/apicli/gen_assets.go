@@ -12,8 +12,8 @@ import (
 
 func assetsServiceCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "assets",
-		Usage: "Assets service commands",
+		Name:  "baboon.assets",
+		Usage: "baboon.Assets service commands",
 		Commands: []*cli.Command{
 			assetsStoreFontCommand(),
 			assetsGetFontsCommand(),
@@ -28,7 +28,7 @@ func assetsServiceCommand() *cli.Command {
 func assetsStoreFontCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "store-font",
-		Usage: "Call Assets.StoreFont",
+		Usage: "Call baboon.Assets.StoreFont",
 		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			if cmd.Bool("req-schema") {
@@ -91,7 +91,7 @@ func assetsStoreFontCommand() *cli.Command {
 func assetsGetFontsCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-fonts",
-		Usage: "Call Assets.GetFonts",
+		Usage: "Call baboon.Assets.GetFonts",
 		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			if cmd.Bool("req-schema") {
@@ -175,7 +175,7 @@ func assetsGetFontsCommand() *cli.Command {
 func assetsListFontsCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "list-fonts",
-		Usage: "Call Assets.ListFonts",
+		Usage: "Call baboon.Assets.ListFonts",
 		Flags: append([]cli.Flag{
 			&cli.Int64Flag{Name: "page"},
 		}, methodFlags()...),
@@ -252,7 +252,7 @@ func assetsListFontsCommand() *cli.Command {
 func assetsDeleteFontCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "delete-font",
-		Usage: "Call Assets.DeleteFont",
+		Usage: "Call baboon.Assets.DeleteFont",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "name"},
 		}, methodFlags()...),
@@ -305,7 +305,7 @@ func assetsDeleteFontCommand() *cli.Command {
 func assetsStoreICCProfileCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "store-icc-profile",
-		Usage: "Call Assets.StoreICCProfile",
+		Usage: "Call baboon.Assets.StoreICCProfile",
 		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			if cmd.Bool("req-schema") {
@@ -366,7 +366,7 @@ func assetsStoreICCProfileCommand() *cli.Command {
 func assetsListICCProfilesCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "list-icc-profiles",
-		Usage: "Call Assets.ListICCProfiles",
+		Usage: "Call baboon.Assets.ListICCProfiles",
 		Flags: append([]cli.Flag{
 			&cli.Int64Flag{Name: "page"},
 		}, methodFlags()...),

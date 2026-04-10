@@ -57,7 +57,7 @@ type apiSchemaEntry struct {
 }
 
 func fetchSchemas(ctx context.Context, e *mcpEnv) ([]parsedSchema, error) {
-	m := apicli.FindMethod("Schemas", "GetAllActive")
+	m := apicli.FindMethod("repository.Schemas", "GetAllActive")
 	if m == nil {
 		return nil, fmt.Errorf("method Schemas.GetAllActive not found in registry")
 	}
@@ -447,7 +447,7 @@ func handleIndexMappings(
 		return mcpError("document_type is required"), nil, nil
 	}
 
-	m := apicli.FindMethod("SearchV1", "GetMappings")
+	m := apicli.FindMethod("index.SearchV1", "GetMappings")
 	if m == nil {
 		return mcpError("SearchV1.GetMappings not found in registry"), nil, nil
 	}

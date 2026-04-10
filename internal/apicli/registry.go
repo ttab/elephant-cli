@@ -42,12 +42,12 @@ type MethodEntry struct {
 // Registry contains metadata and dispatch functions for all elephant-api services.
 var Registry = []ServiceEntry{
 	{
-		Name:        "Documents",
-		Description: "Documents service",
+		Name:        "repository.Documents",
+		Description: "repository.Documents service",
 		Endpoint:    "repository",
 		Methods: []MethodEntry{
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "Get",
 				Description: "Get retrieves a document version.",
 				Endpoint:    "repository",
@@ -3712,7 +3712,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "BulkGet",
 				Description: "BulkGet loads multiple documents in a single request.",
 				Endpoint:    "repository",
@@ -4675,7 +4675,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "GetHistory",
 				Description: "GetHistory lists the document version history.",
 				Endpoint:    "repository",
@@ -4797,7 +4797,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "Update",
 				Description: "Update is used to create new document versions, set statuses, update ACLs.",
 				Endpoint:    "repository",
@@ -7412,7 +7412,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "BulkUpdate",
 				Description: "BulkUpdate is used to create new document versions, set statuses, update ACLs.",
 				Endpoint:    "repository",
@@ -8369,7 +8369,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "Validate",
 				Description: "Validate is used to validate a document without writing it to the repository.",
 				Endpoint:    "repository",
@@ -10906,7 +10906,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "Evict",
 				Description: "Evict removes stored document versions from the main database. The evicted data will be restored from the archive if requested again by clients. It's not allowed to evict the current version of a document.",
 				Endpoint:    "repository",
@@ -10959,7 +10959,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "Delete",
 				Description: "Delete deletes a document and all its associated data.",
 				Endpoint:    "repository",
@@ -11011,7 +11011,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "ListDeleted",
 				Description: "ListDeleted lists deleted document instances for a UUID.",
 				Endpoint:    "repository",
@@ -11120,7 +11120,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "Restore",
 				Description: "Restore recovers a deleted document.",
 				Endpoint:    "repository",
@@ -11181,7 +11181,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "Purge",
 				Description: "Purge removes a deleted document completely.",
 				Endpoint:    "repository",
@@ -11222,7 +11222,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "GetMeta",
 				Description: "GetMeta returns metadata for a document, including the ACL and current status heads.",
 				Endpoint:    "repository",
@@ -11417,7 +11417,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "Eventlog",
 				Description: "Eventlog returns document update events, optionally waiting for new events.",
 				Endpoint:    "repository",
@@ -11608,7 +11608,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "CompactedEventlog",
 				Description: "CompactedEventlog returns document update events. If more than one event has occured for a document in the given window only the latest will be returned.",
 				Endpoint:    "repository",
@@ -11804,7 +11804,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "GetStatus",
 				Description: "GetStatus returns a single status for a document.",
 				Endpoint:    "repository",
@@ -11886,7 +11886,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "GetStatusHistory",
 				Description: "GetStatusHistory returns the history of a status for a document.",
 				Endpoint:    "repository",
@@ -11971,7 +11971,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "GetNilStatuses",
 				Description: "GetNilStatuses returns all the statuses for a document where version is -1.",
 				Endpoint:    "repository",
@@ -12062,7 +12062,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "GetStatusOverview",
 				Description: "GetStatusOverview returns the current version and a set of statuses for a gven list of documents.",
 				Endpoint:    "repository",
@@ -12190,7 +12190,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "GetPermissions",
 				Description: "GetPermissions returns the permissions you have for the document.",
 				Endpoint:    "repository",
@@ -12235,7 +12235,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "Lock",
 				Description: "Lock attempts to acquire a write lock on a document.",
 				Endpoint:    "repository",
@@ -12293,7 +12293,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "ExtendLock",
 				Description: "ExtendLock extends the expiration of an existing lock.",
 				Endpoint:    "repository",
@@ -12347,7 +12347,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "Unlock",
 				Description: "Unlock releases a write lock on a document.",
 				Endpoint:    "repository",
@@ -12387,7 +12387,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "GetWithheld",
 				Description: "GetWithheld returns the next upcoming scheduled publish actions. This is not a complete list, but a list of the next N documents that are considered eligible for publishing.",
 				Endpoint:    "repository",
@@ -12461,7 +12461,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "GetDeliverableInfo",
 				Description: "GetDeliverableInfo returns available information related to the deliverable.",
 				Endpoint:    "repository",
@@ -12515,7 +12515,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "CreateUpload",
 				Description: "CreateUpload is used to start the process of uploading objects that then can be attached to a document.",
 				Endpoint:    "repository",
@@ -12572,7 +12572,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "GetAttachments",
 				Description: "GetAttachments returns download links for the requested attachments.",
 				Endpoint:    "repository",
@@ -12654,7 +12654,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "GetMatching",
 				Description: "GetMatching returns documents matching the given criteria.",
 				Endpoint:    "repository",
@@ -14302,7 +14302,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Documents",
+				Service:     "repository.Documents",
 				Method:      "GetSocketToken",
 				Description: "GetSocketToken returns a token that can be used to open socket connections.",
 				Endpoint:    "repository",
@@ -14344,12 +14344,12 @@ var Registry = []ServiceEntry{
 		},
 	},
 	{
-		Name:        "Schemas",
-		Description: "Schemas service",
+		Name:        "repository.Schemas",
+		Description: "repository.Schemas service",
 		Endpoint:    "repository",
 		Methods: []MethodEntry{
 			{
-				Service:     "Schemas",
+				Service:     "repository.Schemas",
 				Method:      "Register",
 				Description: "Register register a new validation schema version.",
 				Endpoint:    "repository",
@@ -14408,7 +14408,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Schemas",
+				Service:     "repository.Schemas",
 				Method:      "SetActive",
 				Description: "SetActive activates schema versions.",
 				Endpoint:    "repository",
@@ -14452,7 +14452,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Schemas",
+				Service:     "repository.Schemas",
 				Method:      "Get",
 				Description: "Get retrieves a schema.",
 				Endpoint:    "repository",
@@ -14501,7 +14501,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Schemas",
+				Service:     "repository.Schemas",
 				Method:      "GetAllActive",
 				Description: "GetAllActiveSchemas returns the currently active schemas.",
 				Endpoint:    "repository",
@@ -14580,7 +14580,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Schemas",
+				Service:     "repository.Schemas",
 				Method:      "ListActive",
 				Description: "ListActiveSchemas lists the currently active schemas.",
 				Endpoint:    "repository",
@@ -14630,7 +14630,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Schemas",
+				Service:     "repository.Schemas",
 				Method:      "RegisterMetaType",
 				Description: "RegisterMetaType registers a type that can be used for meta documents.",
 				Endpoint:    "repository",
@@ -14670,7 +14670,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Schemas",
+				Service:     "repository.Schemas",
 				Method:      "RegisterMetaTypeUse",
 				Description: "RegisterMetaTypeUse registers a meta type for use with a main type.",
 				Endpoint:    "repository",
@@ -14710,7 +14710,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Schemas",
+				Service:     "repository.Schemas",
 				Method:      "GetDeprecations",
 				Description: "GetDeprecations lists all deprecations.",
 				Endpoint:    "repository",
@@ -14756,7 +14756,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Schemas",
+				Service:     "repository.Schemas",
 				Method:      "UpdateDeprecation",
 				Description: "UpdateDeprecation creates or updates a deprecation.",
 				Endpoint:    "repository",
@@ -14799,7 +14799,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Schemas",
+				Service:     "repository.Schemas",
 				Method:      "GetMetaTypes",
 				Description: "GetMetaTypes lists the registered meta types.",
 				Endpoint:    "repository",
@@ -14848,7 +14848,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Schemas",
+				Service:     "repository.Schemas",
 				Method:      "GetDocumentTypes",
 				Description: "GetDocumentTypes lists the defined document types.",
 				Endpoint:    "repository",
@@ -14887,7 +14887,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Schemas",
+				Service:     "repository.Schemas",
 				Method:      "ConfigureType",
 				Description: "ConfigureType configures a document type.",
 				Endpoint:    "repository",
@@ -14983,7 +14983,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Schemas",
+				Service:     "repository.Schemas",
 				Method:      "GetTypeConfiguration",
 				Description: "GetTypeConfiguration returns the current configuration for a type.",
 				Endpoint:    "repository",
@@ -15083,12 +15083,12 @@ var Registry = []ServiceEntry{
 		},
 	},
 	{
-		Name:        "Workflows",
-		Description: "Workflows service",
+		Name:        "repository.Workflows",
+		Description: "repository.Workflows service",
 		Endpoint:    "repository",
 		Methods: []MethodEntry{
 			{
-				Service:     "Workflows",
+				Service:     "repository.Workflows",
 				Method:      "UpdateStatus",
 				Description: "UpdateStatus creates or updates a status that can be used for documents.",
 				Endpoint:    "repository",
@@ -15132,7 +15132,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Workflows",
+				Service:     "repository.Workflows",
 				Method:      "GetStatuses",
 				Description: "GetStatuses lists all enabled statuses.",
 				Endpoint:    "repository",
@@ -15184,7 +15184,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Workflows",
+				Service:     "repository.Workflows",
 				Method:      "CreateStatusRule",
 				Description: "CreateStatusRule creates or updates a status rule that should be applied when setting statuses.",
 				Endpoint:    "repository",
@@ -15248,7 +15248,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Workflows",
+				Service:     "repository.Workflows",
 				Method:      "DeleteStatusRule",
 				Description: "DeleteStatusRule removes a status rule.",
 				Endpoint:    "repository",
@@ -15286,7 +15286,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Workflows",
+				Service:     "repository.Workflows",
 				Method:      "GetStatusRules",
 				Description: "GetStatusRules returns all status rules.",
 				Endpoint:    "repository",
@@ -15353,7 +15353,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Workflows",
+				Service:     "repository.Workflows",
 				Method:      "SetWorkflow",
 				Description: "SetWorkflow configures a workflow for a document type.",
 				Endpoint:    "repository",
@@ -15414,7 +15414,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Workflows",
+				Service:     "repository.Workflows",
 				Method:      "GetWorkflow",
 				Description: "GetWorkflow for a document type.",
 				Endpoint:    "repository",
@@ -15485,7 +15485,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Workflows",
+				Service:     "repository.Workflows",
 				Method:      "DeleteWorkflow",
 				Description: "DeleteWorkflow removes the workflow configuration for a document type.",
 				Endpoint:    "repository",
@@ -15523,12 +15523,12 @@ var Registry = []ServiceEntry{
 		},
 	},
 	{
-		Name:        "Metrics",
-		Description: "Metrics service",
+		Name:        "repository.Metrics",
+		Description: "repository.Metrics service",
 		Endpoint:    "repository",
 		Methods: []MethodEntry{
 			{
-				Service:     "Metrics",
+				Service:     "repository.Metrics",
 				Method:      "RegisterKind",
 				Description: "Register a metric kind",
 				Endpoint:    "repository",
@@ -15571,7 +15571,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Metrics",
+				Service:     "repository.Metrics",
 				Method:      "DeleteKind",
 				Description: "Delete a metric kind",
 				Endpoint:    "repository",
@@ -15606,7 +15606,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Metrics",
+				Service:     "repository.Metrics",
 				Method:      "GetKinds",
 				Description: "List all metric kinds",
 				Endpoint:    "repository",
@@ -15657,7 +15657,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Metrics",
+				Service:     "repository.Metrics",
 				Method:      "RegisterMetric",
 				Description: "Register a data point",
 				Endpoint:    "repository",
@@ -15702,7 +15702,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Metrics",
+				Service:     "repository.Metrics",
 				Method:      "GetMetrics",
 				Description: "GetMetrics returns metrics related to a document.",
 				Endpoint:    "repository",
@@ -15781,12 +15781,12 @@ var Registry = []ServiceEntry{
 		},
 	},
 	{
-		Name:        "Management",
-		Description: "Management service",
+		Name:        "index.Management",
+		Description: "index.Management service",
 		Endpoint:    "index",
 		Methods: []MethodEntry{
 			{
-				Service:     "Management",
+				Service:     "index.Management",
 				Method:      "RegisterCluster",
 				Description: "RegisterCluster for use with index sets.",
 				Endpoint:    "index",
@@ -15852,7 +15852,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Management",
+				Service:     "index.Management",
 				Method:      "ListClusters",
 				Description: "ListClusters returns a list of clusters together with information about the number of index sets they contain.",
 				Endpoint:    "index",
@@ -15919,7 +15919,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Management",
+				Service:     "index.Management",
 				Method:      "DeleteCluster",
 				Description: "DeleteCluster deletes a registered cluster. A cluster cannot be deleted as long as it has associated index sets.",
 				Endpoint:    "index",
@@ -15955,7 +15955,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Management",
+				Service:     "index.Management",
 				Method:      "DeleteIndexSet",
 				Description: "DeleteIndexSet deletes an index set. The set cannot be active or enabled.",
 				Endpoint:    "index",
@@ -15991,7 +15991,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Management",
+				Service:     "index.Management",
 				Method:      "Reindex",
 				Description: "Reindex set creates a new index set in the specified cluster and starts indexing documents to it.",
 				Endpoint:    "index",
@@ -16033,7 +16033,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Management",
+				Service:     "index.Management",
 				Method:      "PartialReindex",
 				Description: "PartialReindex restarts an existing index set from a given point in the repository eventlog.",
 				Endpoint:    "index",
@@ -16074,7 +16074,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Management",
+				Service:     "index.Management",
 				Method:      "ListIndexSets",
 				Description: "ListIndexSets lists the available index set, with optional filtering.",
 				Endpoint:    "index",
@@ -16163,7 +16163,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Management",
+				Service:     "index.Management",
 				Method:      "SetIndexSetStatus",
 				Description: "SetIndexSetStatus is used to change the status of an index set.",
 				Endpoint:    "index",
@@ -16213,14 +16213,14 @@ var Registry = []ServiceEntry{
 		},
 	},
 	{
-		Name:        "SearchV1",
-		Description: "SearchV1 service",
+		Name:        "index.SearchV1",
+		Description: "index.SearchV1 service",
 		Endpoint:    "index",
 		Methods: []MethodEntry{
 			{
-				Service:     "SearchV1",
+				Service:     "index.SearchV1",
 				Method:      "Query",
-				Description: "SearchV1.Query",
+				Description: "index.SearchV1.Query",
 				Endpoint:    "index",
 				ReqSchema: `{
   "properties": {
@@ -17542,9 +17542,9 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "SearchV1",
+				Service:     "index.SearchV1",
 				Method:      "MultiSearch",
-				Description: "SearchV1.MultiSearch",
+				Description: "index.SearchV1.MultiSearch",
 				Endpoint:    "index",
 				ReqSchema: `{
   "properties": {
@@ -18124,9 +18124,9 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "SearchV1",
+				Service:     "index.SearchV1",
 				Method:      "GetMappings",
-				Description: "SearchV1.GetMappings",
+				Description: "index.SearchV1.GetMappings",
 				Endpoint:    "index",
 				ReqSchema: `{
   "properties": {
@@ -18198,9 +18198,9 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "SearchV1",
+				Service:     "index.SearchV1",
 				Method:      "PollSubscription",
-				Description: "SearchV1.PollSubscription",
+				Description: "index.SearchV1.PollSubscription",
 				Endpoint:    "index",
 				ReqSchema: `{
   "properties": {
@@ -18568,9 +18568,9 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "SearchV1",
+				Service:     "index.SearchV1",
 				Method:      "EndSubscription",
-				Description: "SearchV1.EndSubscription",
+				Description: "index.SearchV1.EndSubscription",
 				Endpoint:    "index",
 				ReqSchema: `{
   "properties": {
@@ -18606,12 +18606,12 @@ var Registry = []ServiceEntry{
 		},
 	},
 	{
-		Name:        "Settings",
+		Name:        "user.Settings",
 		Description: "Settings service manages configuration for authenticated users.  All methods in this service rely on the `sub` claim from the authentication (bearer) token to identify the target user.",
 		Endpoint:    "user",
 		Methods: []MethodEntry{
 			{
-				Service:     "Settings",
+				Service:     "user.Settings",
 				Method:      "GetDocument",
 				Description: "Gets a specific document for the authenticated user.",
 				Endpoint:    "user",
@@ -19499,7 +19499,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Settings",
+				Service:     "user.Settings",
 				Method:      "ListDocuments",
 				Description: "Lists documents for the authenticated user.",
 				Endpoint:    "user",
@@ -20386,7 +20386,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Settings",
+				Service:     "user.Settings",
 				Method:      "UpdateDocument",
 				Description: "Updates an existing or creates a new document for the authenticated user.",
 				Endpoint:    "user",
@@ -22900,7 +22900,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Settings",
+				Service:     "user.Settings",
 				Method:      "DeleteDocument",
 				Description: "Deletes a document for the authenticated user.",
 				Endpoint:    "user",
@@ -22948,7 +22948,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Settings",
+				Service:     "user.Settings",
 				Method:      "GetProperties",
 				Description: "Gets properties for the authenticated user.",
 				Endpoint:    "user",
@@ -23026,7 +23026,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Settings",
+				Service:     "user.Settings",
 				Method:      "SetProperties",
 				Description: "Sets or updates properties for the authenticated user.",
 				Endpoint:    "user",
@@ -23078,7 +23078,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Settings",
+				Service:     "user.Settings",
 				Method:      "DeleteProperties",
 				Description: "Deletes properties for the authenticated user.",
 				Endpoint:    "user",
@@ -23126,7 +23126,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Settings",
+				Service:     "user.Settings",
 				Method:      "PollEventLog",
 				Description: "Polls for a stream of changes (creates, updates, deletes) for both documents and properties for the authenticated user.",
 				Endpoint:    "user",
@@ -23233,12 +23233,12 @@ var Registry = []ServiceEntry{
 		},
 	},
 	{
-		Name:        "Messages",
-		Description: "Messages service",
+		Name:        "user.Messages",
+		Description: "user.Messages service",
 		Endpoint:    "user",
 		Methods: []MethodEntry{
 			{
-				Service:     "Messages",
+				Service:     "user.Messages",
 				Method:      "PushMessage",
 				Description: "Pushes a new message to a recipient.",
 				Endpoint:    "user",
@@ -23293,7 +23293,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Messages",
+				Service:     "user.Messages",
 				Method:      "PushInboxMessage",
 				Description: "Pushes a new inbox message to a recipient.",
 				Endpoint:    "user",
@@ -25791,7 +25791,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Messages",
+				Service:     "user.Messages",
 				Method:      "PollMessages",
 				Description: "Polls for new messages for a recipient.",
 				Endpoint:    "user",
@@ -25880,7 +25880,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Messages",
+				Service:     "user.Messages",
 				Method:      "PollInboxMessages",
 				Description: "Polls for new inbox messages for a recipient.",
 				Endpoint:    "user",
@@ -26746,7 +26746,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Messages",
+				Service:     "user.Messages",
 				Method:      "ListInboxMessages",
 				Description: "Lists all inbox messages for a recipient.",
 				Endpoint:    "user",
@@ -27622,7 +27622,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Messages",
+				Service:     "user.Messages",
 				Method:      "UpdateInboxMessage",
 				Description: "Updates an existing inbox message.",
 				Endpoint:    "user",
@@ -27663,7 +27663,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Messages",
+				Service:     "user.Messages",
 				Method:      "DeleteInboxMessage",
 				Description: "Deletes an inbox message.",
 				Endpoint:    "user",
@@ -27702,12 +27702,12 @@ var Registry = []ServiceEntry{
 		},
 	},
 	{
-		Name:        "Check",
+		Name:        "spell.Check",
 		Description: "Check content for spelling errors.",
 		Endpoint:    "spell",
 		Methods: []MethodEntry{
 			{
-				Service:     "Check",
+				Service:     "spell.Check",
 				Method:      "Text",
 				Description: "Text spellchecks a text and returns the misspelled words or phrases.",
 				Endpoint:    "spell",
@@ -27800,7 +27800,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Check",
+				Service:     "spell.Check",
 				Method:      "Suggestions",
 				Description: "Suggestions returns suggestions for a word or phrase.",
 				Endpoint:    "spell",
@@ -27859,12 +27859,12 @@ var Registry = []ServiceEntry{
 		},
 	},
 	{
-		Name:        "Dictionaries",
+		Name:        "spell.Dictionaries",
 		Description: "Dictionaries is used to manage custom dictionary entries. Custom dictionaries can be used to add both words and phrases.",
 		Endpoint:    "spell",
 		Methods: []MethodEntry{
 			{
-				Service:     "Dictionaries",
+				Service:     "spell.Dictionaries",
 				Method:      "SupportedLanguages",
 				Description: "SupportedLanguages returns a list of supported languages.",
 				Endpoint:    "spell",
@@ -27909,7 +27909,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Dictionaries",
+				Service:     "spell.Dictionaries",
 				Method:      "ListDictionaries",
 				Description: "ListDictionaries lists the currently available custom dictionaries.",
 				Endpoint:    "spell",
@@ -27958,7 +27958,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Dictionaries",
+				Service:     "spell.Dictionaries",
 				Method:      "ListEntries",
 				Description: "ListEntries lists entries in the custom dictionaries.",
 				Endpoint:    "spell",
@@ -28056,7 +28056,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Dictionaries",
+				Service:     "spell.Dictionaries",
 				Method:      "GetEntry",
 				Description: "GetEntry returns the details of a custom word or phrase.",
 				Endpoint:    "spell",
@@ -28143,7 +28143,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Dictionaries",
+				Service:     "spell.Dictionaries",
 				Method:      "SetEntry",
 				Description: "SetEntry is used to add or update custom dictionary entries.",
 				Endpoint:    "spell",
@@ -28220,7 +28220,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Dictionaries",
+				Service:     "spell.Dictionaries",
 				Method:      "DeleteEntry",
 				Description: "DeleteEntry is used to remove an entry.",
 				Endpoint:    "spell",
@@ -28262,14 +28262,14 @@ var Registry = []ServiceEntry{
 		},
 	},
 	{
-		Name:        "Replication",
-		Description: "Replication service",
+		Name:        "replicant.Replication",
+		Description: "replicant.Replication service",
 		Endpoint:    "replicant",
 		Methods: []MethodEntry{
 			{
-				Service:     "Replication",
+				Service:     "replicant.Replication",
 				Method:      "SendDocument",
-				Description: "Replication.SendDocument",
+				Description: "replicant.Replication.SendDocument",
 				Endpoint:    "replicant",
 				ReqSchema: `{
   "properties": {
@@ -28313,14 +28313,14 @@ var Registry = []ServiceEntry{
 		},
 	},
 	{
-		Name:        "Assets",
-		Description: "Assets service",
+		Name:        "baboon.Assets",
+		Description: "baboon.Assets service",
 		Endpoint:    "baboon",
 		Methods: []MethodEntry{
 			{
-				Service:     "Assets",
+				Service:     "baboon.Assets",
 				Method:      "StoreFont",
-				Description: "Assets.StoreFont",
+				Description: "baboon.Assets.StoreFont",
 				Endpoint:    "baboon",
 				ReqSchema: `{
   "properties": {
@@ -28368,9 +28368,9 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Assets",
+				Service:     "baboon.Assets",
 				Method:      "GetFonts",
-				Description: "Assets.GetFonts",
+				Description: "baboon.Assets.GetFonts",
 				Endpoint:    "baboon",
 				ReqSchema: `{
   "properties": {
@@ -28439,9 +28439,9 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Assets",
+				Service:     "baboon.Assets",
 				Method:      "ListFonts",
-				Description: "Assets.ListFonts",
+				Description: "baboon.Assets.ListFonts",
 				Endpoint:    "baboon",
 				ReqSchema: `{
   "properties": {
@@ -28498,9 +28498,9 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Assets",
+				Service:     "baboon.Assets",
 				Method:      "DeleteFont",
-				Description: "Assets.DeleteFont",
+				Description: "baboon.Assets.DeleteFont",
 				Endpoint:    "baboon",
 				ReqSchema: `{
   "properties": {
@@ -28533,9 +28533,9 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Assets",
+				Service:     "baboon.Assets",
 				Method:      "StoreICCProfile",
-				Description: "Assets.StoreICCProfile",
+				Description: "baboon.Assets.StoreICCProfile",
 				Endpoint:    "baboon",
 				ReqSchema: `{
   "properties": {
@@ -28581,9 +28581,9 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Assets",
+				Service:     "baboon.Assets",
 				Method:      "ListICCProfiles",
-				Description: "Assets.ListICCProfiles",
+				Description: "baboon.Assets.ListICCProfiles",
 				Endpoint:    "baboon",
 				ReqSchema: `{
   "properties": {
@@ -28642,14 +28642,14 @@ var Registry = []ServiceEntry{
 		},
 	},
 	{
-		Name:        "Print",
-		Description: "Print service",
+		Name:        "baboon.Print",
+		Description: "baboon.Print service",
 		Endpoint:    "baboon",
 		Methods: []MethodEntry{
 			{
-				Service:     "Print",
+				Service:     "baboon.Print",
 				Method:      "RenderArticle",
-				Description: "Print.RenderArticle",
+				Description: "baboon.Print.RenderArticle",
 				Endpoint:    "baboon",
 				ReqSchema: `{
   "properties": {
@@ -28822,9 +28822,9 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Print",
+				Service:     "baboon.Print",
 				Method:      "GetEditableArchive",
-				Description: "Print.GetEditableArchive",
+				Description: "baboon.Print.GetEditableArchive",
 				Endpoint:    "baboon",
 				ReqSchema: `{
   "properties": {
@@ -28858,7 +28858,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Print",
+				Service:     "baboon.Print",
 				Method:      "LayoutPreview",
 				Description: "LayoutPreview is used by the CLI tool to do preview rendering.",
 				Endpoint:    "baboon",
@@ -33932,9 +33932,9 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Print",
+				Service:     "baboon.Print",
 				Method:      "CreateFlow",
-				Description: "Print.CreateFlow",
+				Description: "baboon.Print.CreateFlow",
 				Endpoint:    "baboon",
 				ReqSchema: `{
   "properties": {
@@ -34000,9 +34000,9 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Print",
+				Service:     "baboon.Print",
 				Method:      "CopyArticleToFlow",
-				Description: "Print.CopyArticleToFlow",
+				Description: "baboon.Print.CopyArticleToFlow",
 				Endpoint:    "baboon",
 				ReqSchema: `{
   "properties": {
@@ -34059,9 +34059,9 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Print",
+				Service:     "baboon.Print",
 				Method:      "GetScribusInfo",
-				Description: "Print.GetScribusInfo",
+				Description: "baboon.Print.GetScribusInfo",
 				Endpoint:    "baboon",
 				ReqSchema: `{
   "properties": {
@@ -34170,7 +34170,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Print",
+				Service:     "baboon.Print",
 				Method:      "GetRenderedArticles",
 				Description: "GetRenderedArticles allows a client to consume and download all finished renders.",
 				Endpoint:    "baboon",
@@ -34357,7 +34357,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Print",
+				Service:     "baboon.Print",
 				Method:      "SetHypenation",
 				Description: "SetHypenation allows clients to set custom hypenation for a word.",
 				Endpoint:    "baboon",
@@ -34401,7 +34401,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Print",
+				Service:     "baboon.Print",
 				Method:      "ListHypenations",
 				Description: "ListHypenations is used to list words in the hypenation dictionary.",
 				Endpoint:    "baboon",
@@ -34471,7 +34471,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Print",
+				Service:     "baboon.Print",
 				Method:      "RemoveHypenation",
 				Description: "RemoveHypenation is used to remove a custom hypenation for a word.",
 				Endpoint:    "baboon",
@@ -34511,12 +34511,12 @@ var Registry = []ServiceEntry{
 		},
 	},
 	{
-		Name:        "Tagger",
-		Description: "Tagger service",
+		Name:        "eidos.Tagger",
+		Description: "eidos.Tagger service",
 		Endpoint:    "eidos2",
 		Methods: []MethodEntry{
 			{
-				Service:     "Tagger",
+				Service:     "eidos.Tagger",
 				Method:      "AnalyseDocument",
 				Description: "AnalyseDocument and return the generated meta document and the text representatin of the document that was used for analysis.",
 				Endpoint:    "eidos2",
@@ -39478,7 +39478,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Tagger",
+				Service:     "eidos.Tagger",
 				Method:      "RegisterUsage",
 				Description: "RegisterUsage is used to inform eidos when an external system has tagged a piece of media with entities managed by eidos.",
 				Endpoint:    "eidos2",
@@ -39527,12 +39527,12 @@ var Registry = []ServiceEntry{
 		},
 	},
 	{
-		Name:        "Manage",
-		Description: "Manage service",
+		Name:        "everysport.Manage",
+		Description: "everysport.Manage service",
 		Endpoint:    "everysport",
 		Methods: []MethodEntry{
 			{
-				Service:     "Manage",
+				Service:     "everysport.Manage",
 				Method:      "ManualImport",
 				Description: "ManualImport re-imports calendar events based on a search query.",
 				Endpoint:    "everysport",
@@ -39595,12 +39595,12 @@ var Registry = []ServiceEntry{
 		},
 	},
 	{
-		Name:        "Metadata",
+		Name:        "ntb.Metadata",
 		Description: "Metadata service for retrieving assignment metadata.",
 		Endpoint:    "ntb",
 		Methods: []MethodEntry{
 			{
-				Service:     "Metadata",
+				Service:     "ntb.Metadata",
 				Method:      "GetAssignment",
 				Description: "GetAssignment returns metadata for a specific assignment.",
 				Endpoint:    "ntb",
@@ -39646,12 +39646,12 @@ var Registry = []ServiceEntry{
 		},
 	},
 	{
-		Name:        "Media",
+		Name:        "ntb.Media",
 		Description: "Media service for interacting with the NTB media manager archive. Experimental.",
 		Endpoint:    "ntb",
 		Methods: []MethodEntry{
 			{
-				Service:     "Media",
+				Service:     "ntb.Media",
 				Method:      "Search",
 				Description: "Search in a media archive.",
 				Endpoint:    "ntb",
@@ -40122,7 +40122,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Media",
+				Service:     "ntb.Media",
 				Method:      "GetItem",
 				Description: "GetItem fetches a single media item.",
 				Endpoint:    "ntb",
@@ -40427,7 +40427,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Media",
+				Service:     "ntb.Media",
 				Method:      "GetSortFields",
 				Description: "GetSortFields returns the available sort fields.",
 				Endpoint:    "ntb",
@@ -40472,12 +40472,12 @@ var Registry = []ServiceEntry{
 		},
 	},
 	{
-		Name:        "Nynorsk",
+		Name:        "ntb.Nynorsk",
 		Description: "Nynorsk service for translating documents using Nynorskroboten.",
 		Endpoint:    "ntb",
 		Methods: []MethodEntry{
 			{
-				Service:     "Nynorsk",
+				Service:     "ntb.Nynorsk",
 				Method:      "Translate",
 				Description: "Translate translates a document between Scandinavian languages.",
 				Endpoint:    "ntb",
@@ -40626,7 +40626,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Nynorsk",
+				Service:     "ntb.Nynorsk",
 				Method:      "GetLanguagePrefs",
 				Description: "GetLanguagePrefs returns the available optional language forms.",
 				Endpoint:    "ntb",
@@ -40683,7 +40683,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Nynorsk",
+				Service:     "ntb.Nynorsk",
 				Method:      "GetDocumentFormats",
 				Description: "GetDocumentFormats returns the supported document formats.",
 				Endpoint:    "ntb",
@@ -40746,7 +40746,7 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "Nynorsk",
+				Service:     "ntb.Nynorsk",
 				Method:      "GetPreferenceTemplates",
 				Description: "GetPreferenceTemplates returns the available preference templates and the language forms they enable.",
 				Endpoint:    "ntb",
@@ -40795,14 +40795,14 @@ var Registry = []ServiceEntry{
 		},
 	},
 	{
-		Name:        "RssFeed",
-		Description: "RssFeed service",
+		Name:        "wires.RssFeed",
+		Description: "wires.RssFeed service",
 		Endpoint:    "wires",
 		Methods: []MethodEntry{
 			{
-				Service:     "RssFeed",
+				Service:     "wires.RssFeed",
 				Method:      "GetAllFeeds",
-				Description: "RssFeed.GetAllFeeds",
+				Description: "wires.RssFeed.GetAllFeeds",
 				Endpoint:    "wires",
 				ReqSchema: `{
   "properties": {
@@ -40923,9 +40923,9 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "RssFeed",
+				Service:     "wires.RssFeed",
 				Method:      "UpdateFeed",
-				Description: "RssFeed.UpdateFeed",
+				Description: "wires.RssFeed.UpdateFeed",
 				Endpoint:    "wires",
 				ReqSchema: `{
   "properties": {
@@ -41021,9 +41021,9 @@ var Registry = []ServiceEntry{
 				},
 			},
 			{
-				Service:     "RssFeed",
+				Service:     "wires.RssFeed",
 				Method:      "DeleteFeed",
-				Description: "RssFeed.DeleteFeed",
+				Description: "wires.RssFeed.DeleteFeed",
 				Endpoint:    "wires",
 				ReqSchema: `{
   "properties": {

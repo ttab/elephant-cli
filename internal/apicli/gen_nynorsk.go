@@ -12,7 +12,7 @@ import (
 
 func nynorskServiceCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "nynorsk",
+		Name:  "ntb.nynorsk",
 		Usage: "Nynorsk service for translating documents using Nynorskroboten.",
 		Commands: []*cli.Command{
 			nynorskTranslateCommand(),

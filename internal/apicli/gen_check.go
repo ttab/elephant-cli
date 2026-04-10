@@ -12,7 +12,7 @@ import (
 
 func checkServiceCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "check",
+		Name:  "spell.check",
 		Usage: "Check content for spelling errors.",
 		Commands: []*cli.Command{
 			checkTextCommand(),

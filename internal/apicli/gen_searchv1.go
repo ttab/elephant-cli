@@ -12,8 +12,8 @@ import (
 
 func searchV1ServiceCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "search-v1",
-		Usage: "SearchV1 service commands",
+		Name:  "index.search-v1",
+		Usage: "index.SearchV1 service commands",
 		Commands: []*cli.Command{
 			searchV1QueryCommand(),
 			searchV1MultiSearchCommand(),
@@ -27,7 +27,7 @@ func searchV1ServiceCommand() *cli.Command {
 func searchV1QueryCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "query",
-		Usage: "Call SearchV1.Query",
+		Usage: "Call index.SearchV1.Query",
 		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			if cmd.Bool("req-schema") {
@@ -1364,7 +1364,7 @@ func searchV1QueryCommand() *cli.Command {
 func searchV1MultiSearchCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "multi-search",
-		Usage: "Call SearchV1.MultiSearch",
+		Usage: "Call index.SearchV1.MultiSearch",
 		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			if cmd.Bool("req-schema") {
@@ -1959,7 +1959,7 @@ func searchV1MultiSearchCommand() *cli.Command {
 func searchV1GetMappingsCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-mappings",
-		Usage: "Call SearchV1.GetMappings",
+		Usage: "Call index.SearchV1.GetMappings",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "document-type"},
 		}, methodFlags()...),
@@ -2051,7 +2051,7 @@ func searchV1GetMappingsCommand() *cli.Command {
 func searchV1PollSubscriptionCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "poll-subscription",
-		Usage: "Call SearchV1.PollSubscription",
+		Usage: "Call index.SearchV1.PollSubscription",
 		Flags: methodFlags(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			if cmd.Bool("req-schema") {
@@ -2434,7 +2434,7 @@ func searchV1PollSubscriptionCommand() *cli.Command {
 func searchV1EndSubscriptionCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "end-subscription",
-		Usage: "Call SearchV1.EndSubscription",
+		Usage: "Call index.SearchV1.EndSubscription",
 		Flags: append([]cli.Flag{
 			&cli.Int64Flag{Name: "id"},
 		}, methodFlags()...),

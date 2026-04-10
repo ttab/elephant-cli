@@ -12,7 +12,7 @@ import (
 
 func metadataServiceCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "metadata",
+		Name:  "ntb.metadata",
 		Usage: "Metadata service for retrieving assignment metadata.",
 		Commands: []*cli.Command{
 			metadataGetAssignmentCommand(),

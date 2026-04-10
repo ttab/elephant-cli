@@ -12,8 +12,8 @@ import (
 
 func replicationServiceCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "replication",
-		Usage: "Replication service commands",
+		Name:  "replicant.replication",
+		Usage: "replicant.Replication service commands",
 		Commands: []*cli.Command{
 			replicationSendDocumentCommand(),
 		},
@@ -23,7 +23,7 @@ func replicationServiceCommand() *cli.Command {
 func replicationSendDocumentCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "send-document",
-		Usage: "Call Replication.SendDocument",
+		Usage: "Call replicant.Replication.SendDocument",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "uuid"},
 			&cli.BoolFlag{Name: "force"},

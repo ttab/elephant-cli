@@ -12,8 +12,8 @@ import (
 
 func documentsServiceCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "documents",
-		Usage: "Documents service commands",
+		Name:  "repository.documents",
+		Usage: "repository.Documents service commands",
 		Commands: []*cli.Command{
 			documentsGetCommand(),
 			documentsBulkGetCommand(),

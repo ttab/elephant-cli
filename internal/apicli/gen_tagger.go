@@ -12,8 +12,8 @@ import (
 
 func taggerServiceCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "tagger",
-		Usage: "Tagger service commands",
+		Name:  "eidos.tagger",
+		Usage: "eidos.Tagger service commands",
 		Commands: []*cli.Command{
 			taggerAnalyseDocumentCommand(),
 			taggerRegisterUsageCommand(),

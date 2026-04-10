@@ -12,7 +12,7 @@ import (
 
 func mediaServiceCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "media",
+		Name:  "ntb.media",
 		Usage: "Media service for interacting with the NTB media manager archive. Experimental.",
 		Commands: []*cli.Command{
 			mediaSearchCommand(),

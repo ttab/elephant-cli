@@ -98,13 +98,13 @@ type searchMethodsInput struct {
 }
 
 type getSchemaInput struct {
-	Service string `json:"service" jsonschema:"Service name (e.g. Documents)"`
+	Service string `json:"service" jsonschema:"Qualified service name (e.g. repository.Documents, index.SearchV1, eidos.Tagger)"`
 	Method  string `json:"method" jsonschema:"Method name (e.g. Get)"`
 	Type    string `json:"type" jsonschema:"Schema type: 'request' or 'response'"`
 }
 
 type callMethodInput struct {
-	Service string         `json:"service" jsonschema:"Service name (e.g. Documents)"`
+	Service string         `json:"service" jsonschema:"Qualified service name (e.g. repository.Documents, index.SearchV1, eidos.Tagger)"`
 	Method  string         `json:"method" jsonschema:"Method name (e.g. Get)"`
 	Input   map[string]any `json:"input,omitempty" jsonschema:"Request payload as JSON object (omit for methods with no required fields)"`
 }

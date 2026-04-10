@@ -12,8 +12,8 @@ import (
 
 func schemasServiceCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "schemas",
-		Usage: "Schemas service commands",
+		Name:  "repository.schemas",
+		Usage: "repository.Schemas service commands",
 		Commands: []*cli.Command{
 			schemasRegisterCommand(),
 			schemasSetActiveCommand(),

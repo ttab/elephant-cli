@@ -12,8 +12,8 @@ import (
 
 func workflowsServiceCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "workflows",
-		Usage: "Workflows service commands",
+		Name:  "repository.workflows",
+		Usage: "repository.Workflows service commands",
 		Commands: []*cli.Command{
 			workflowsUpdateStatusCommand(),
 			workflowsGetStatusesCommand(),

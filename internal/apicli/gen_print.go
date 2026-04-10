@@ -12,8 +12,8 @@ import (
 
 func printServiceCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "print",
-		Usage: "Print service commands",
+		Name:  "baboon.print",
+		Usage: "baboon.Print service commands",
 		Commands: []*cli.Command{
 			printRenderArticleCommand(),
 			printGetEditableArchiveCommand(),
@@ -32,7 +32,7 @@ func printServiceCommand() *cli.Command {
 func printRenderArticleCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "render-article",
-		Usage: "Call Print.RenderArticle",
+		Usage: "Call baboon.Print.RenderArticle",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "article-uuid", Usage: "ArticleUuid is the UUID of the print article to render. Required."},
 			&cli.StringFlag{Name: "layout-id", Usage: "LayoutId is the ID of the article layout to render. Required."},
@@ -233,7 +233,7 @@ func printRenderArticleCommand() *cli.Command {
 func printGetEditableArchiveCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-editable-archive",
-		Usage: "Call Print.GetEditableArchive",
+		Usage: "Call baboon.Print.GetEditableArchive",
 		Flags: append([]cli.Flag{
 			&cli.Int64Flag{Name: "render-id"},
 		}, methodFlags()...),
@@ -5374,7 +5374,7 @@ func printLayoutPreviewCommand() *cli.Command {
 func printCreateFlowCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "create-flow",
-		Usage: "Call Print.CreateFlow",
+		Usage: "Call baboon.Print.CreateFlow",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "flow-uuid", Usage: "FlowUuid to instantiate on the given date. Required."},
 			&cli.StringFlag{Name: "date", Usage: "Date to instantiate the flow on in the format YYYY-MM-DD. Required."},
@@ -5468,7 +5468,7 @@ func printCreateFlowCommand() *cli.Command {
 func printCopyArticleToFlowCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "copy-article-to-flow",
-		Usage: "Call Print.CopyArticleToFlow",
+		Usage: "Call baboon.Print.CopyArticleToFlow",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "source-uuid", Usage: "SourceUuid is the UUID of the article that we want to copy. Required."},
 			&cli.StringFlag{Name: "flow-uuid", Usage: "FlowUuid to copy the article to. Required."},
@@ -5553,7 +5553,7 @@ func printCopyArticleToFlowCommand() *cli.Command {
 func printGetScribusInfoCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-scribus-info",
-		Usage: "Call Print.GetScribusInfo",
+		Usage: "Call baboon.Print.GetScribusInfo",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "uuid", Usage: "Uuid of the layout document to get information for. Required."},
 		}, methodFlags()...),

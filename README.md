@@ -81,25 +81,25 @@ elephant <service> <method> [flags]
 
 | Command | Service | Endpoint |
 |---------|---------|----------|
-| `documents` | repository.Documents | repository |
-| `schemas` | repository.Schemas | repository |
-| `workflows` | repository.Workflows | repository |
-| `metrics` | repository.Metrics | repository |
-| `management` | index.Management | index |
-| `search-v1` | index.SearchV1 | index |
-| `settings` | user.Settings | user |
-| `messages` | user.Messages | user |
-| `check` | spell.Check | spell |
-| `dictionaries` | spell.Dictionaries | spell |
-| `replication` | replicant.Replication | replicant |
-| `tagger` | eidos.Tagger | eidos2 |
-| `assets` | baboon.Assets | baboon |
-| `print` | baboon.Print | baboon |
-| `manage` | everysport.Manage | everysport |
-| `metadata` | ntb.Metadata | ntb |
-| `media` | ntb.Media | ntb |
-| `nynorsk` | ntb.Nynorsk | ntb |
-| `rss-feed` | wires.RssFeed | wires |
+| `repository.documents` | Documents | repository |
+| `repository.schemas` | Schemas | repository |
+| `repository.workflows` | Workflows | repository |
+| `repository.metrics` | Metrics | repository |
+| `index.management` | Management | index |
+| `index.search-v1` | SearchV1 | index |
+| `user.settings` | Settings | user |
+| `user.messages` | Messages | user |
+| `spell.check` | Check | spell |
+| `spell.dictionaries` | Dictionaries | spell |
+| `replicant.replication` | Replication | replicant |
+| `eidos.tagger` | Tagger | eidos2 |
+| `baboon.assets` | Assets | baboon |
+| `baboon.print` | Print | baboon |
+| `everysport.manage` | Manage | everysport |
+| `ntb.metadata` | Metadata | ntb |
+| `ntb.media` | Media | ntb |
+| `ntb.nynorsk` | Nynorsk | ntb |
+| `wires.rss-feed` | RssFeed | wires |
 
 ### Using flags
 
@@ -107,10 +107,10 @@ Methods whose request messages contain only scalar fields can be invoked
 directly with flags:
 
 ```sh
-elephant documents get --uuid 7a3f08c1-b252-4b4a-af3e-b9301ed3b05a
-elephant documents get-history --uuid 7a3f08c1-b252-4b4a-af3e-b9301ed3b05a --before 5
-elephant schemas list-active
-elephant dictionaries list-entries --language sv --page 1
+elephant repository.documents get --uuid 7a3f08c1-b252-4b4a-af3e-b9301ed3b05a
+elephant repository.documents get-history --uuid 7a3f08c1-b252-4b4a-af3e-b9301ed3b05a --before 5
+elephant repository.schemas list-active
+elephant spell.dictionaries list-entries --language sv-se --page 1
 ```
 
 ### Using JSON input
@@ -119,8 +119,8 @@ All methods accept `--file` (`-f`) to read the request as JSON from a file or
 stdin:
 
 ```sh
-elephant documents update --file request.json
-echo '{"uuid":"..."}' | elephant documents get --file -
+elephant repository.documents update --file request.json
+echo '{"uuid":"..."}' | elephant repository.documents get --file -
 ```
 
 ### Using toon format
@@ -129,7 +129,7 @@ Pass `--fmt-toon` to read and write
 [toon](https://github.com/toon-format/toon-go) instead of JSON:
 
 ```sh
-elephant --fmt-toon documents get --uuid 7a3f08c1-b252-4b4a-af3e-b9301ed3b05a
+elephant --fmt-toon repository.documents get --uuid 7a3f08c1-b252-4b4a-af3e-b9301ed3b05a
 ```
 
 ### JSON Schemas
@@ -138,8 +138,8 @@ Every method command supports `--req-schema` and `--res-schema` to print the
 JSON Schema for the request and response messages:
 
 ```sh
-elephant documents get --req-schema
-elephant documents get --res-schema
+elephant repository.documents get --req-schema
+elephant repository.documents get --res-schema
 ```
 
 ## MCP server

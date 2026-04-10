@@ -12,8 +12,8 @@ import (
 
 func messagesServiceCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "messages",
-		Usage: "Messages service commands",
+		Name:  "user.messages",
+		Usage: "user.Messages service commands",
 		Commands: []*cli.Command{
 			messagesPushMessageCommand(),
 			messagesPushInboxMessageCommand(),

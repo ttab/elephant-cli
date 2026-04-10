@@ -48,7 +48,7 @@ func {{$.FuncPrefix}}{{.GoName}}Command() *cli.Command {
 				return err
 			}
 
-			client := {{$.GoAlias}}.New{{$.ServiceName}}ProtobufClient(endpoint, httpClient)
+			client := {{$.GoAlias}}.New{{$.ProtoName}}ProtobufClient(endpoint, httpClient)
 
 			var req {{$.GoAlias}}.{{.InputType}}
 

@@ -12,8 +12,8 @@ import (
 
 func managementServiceCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "management",
-		Usage: "Management service commands",
+		Name:  "index.management",
+		Usage: "index.Management service commands",
 		Commands: []*cli.Command{
 			managementRegisterClusterCommand(),
 			managementListClustersCommand(),

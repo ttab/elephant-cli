@@ -12,7 +12,7 @@ import (
 
 func settingsServiceCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "settings",
+		Name:  "user.settings",
 		Usage: "Settings service manages configuration for authenticated users.  All methods in this service rely on the `sub` claim from the authentication (bearer) token to identify the target user.",
 		Commands: []*cli.Command{
 			settingsGetDocumentCommand(),

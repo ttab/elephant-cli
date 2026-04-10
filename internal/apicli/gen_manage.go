@@ -12,8 +12,8 @@ import (
 
 func manageServiceCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "manage",
-		Usage: "Manage service commands",
+		Name:  "everysport.manage",
+		Usage: "everysport.Manage service commands",
 		Commands: []*cli.Command{
 			manageManualImportCommand(),
 		},

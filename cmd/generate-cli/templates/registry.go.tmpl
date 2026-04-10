@@ -50,7 +50,7 @@ var Registry = []ServiceEntry{
 				ReqSchema:   {{backtickLit .ReqSchema}},
 				ResSchema:   {{backtickLit .ResSchema}},
 				Call: func(ctx context.Context, httpClient *http.Client, endpoint, input string) (string, error) {
-					client := {{$svc.GoAlias}}.New{{$svc.ServiceName}}ProtobufClient(endpoint, httpClient)
+					client := {{$svc.GoAlias}}.New{{$svc.ProtoName}}ProtobufClient(endpoint, httpClient)
 					var req {{$svc.GoAlias}}.{{.InputType}}
 					if input != "" {
 						if err := protojson.Unmarshal([]byte(input), &req); err != nil {

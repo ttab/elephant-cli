@@ -120,7 +120,8 @@ type serviceTmplData struct {
 	GoImportPath string
 	GoAlias      string
 	Endpoint     string
-	ServiceName  string
+	ServiceName  string // qualified: "repository.Documents"
+	ProtoName    string // unqualified: "Documents" (for protobuf client constructor)
 	ServiceUsage string
 	CLIName      string
 	FuncPrefix   string
@@ -279,9 +280,10 @@ func processService(cfg serviceConfig, sd protoreflect.ServiceDescriptor, commen
 		GoImportPath: cfg.goImportPath,
 		GoAlias:      cfg.goAlias,
 		Endpoint:     cfg.endpoint,
-		ServiceName:  serviceName,
+		ServiceName:  cfg.goAlias + "." + serviceName,
+		ProtoName:    serviceName,
 		ServiceUsage: comments.get(serviceName),
-		CLIName:      camelToKebab(serviceName),
+		CLIName:      cfg.goAlias + "." + camelToKebab(serviceName),
 		FuncPrefix:   unexport(serviceName),
 	}
 

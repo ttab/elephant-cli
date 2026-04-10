@@ -12,7 +12,7 @@ import (
 
 func dictionariesServiceCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "dictionaries",
+		Name:  "spell.dictionaries",
 		Usage: "Dictionaries is used to manage custom dictionary entries. Custom dictionaries can be used to add both words and phrases.",
 		Commands: []*cli.Command{
 			dictionariesSupportedLanguagesCommand(),
