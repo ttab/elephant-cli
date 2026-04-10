@@ -33,6 +33,7 @@ func mcpCommand() *cli.Command {
 type mcpEnv struct {
 	httpClient *http.Client
 	conf       *clitools.ConfigurationHandler
+	schemas    *schemaCache
 }
 
 func runMCPServer(ctx context.Context, cmd *cli.Command) error {
@@ -63,6 +64,7 @@ func runMCPServer(ctx context.Context, cmd *cli.Command) error {
 	e := &mcpEnv{
 		httpClient: httpClient,
 		conf:       conf,
+		schemas:    &schemaCache{},
 	}
 
 	server := mcp.NewServer(&mcp.Implementation{
@@ -71,6 +73,7 @@ func runMCPServer(ctx context.Context, cmd *cli.Command) error {
 	}, nil)
 
 	registerMCPTools(server, e)
+	registerSchemaTools(server, e)
 
 	if httpAddr != "" {
 		handler := mcp.NewStreamableHTTPHandler(
