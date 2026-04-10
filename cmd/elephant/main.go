@@ -199,6 +199,7 @@ func main() {
 		&searchCommand,
 		&setStatusCommand,
 		&runListCommand,
+		mcpCommand(),
 		clitools.ConfigureCliCommands(
 			appName, clitools.DefaultApplicationID,
 		),

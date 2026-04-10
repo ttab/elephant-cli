@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 	"text/template"
 	"unicode"
@@ -105,6 +106,11 @@ type commandsTmplData struct {
 	Services []serviceTmplData
 }
 
+type registryTmplData struct {
+	Services []serviceTmplData
+	Imports  []string
+}
+
 func main() {
 	tmpl, err := template.New("").Funcs(template.FuncMap{
 		"join": strings.Join,
@@ -159,7 +165,28 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Fprintf(os.Stderr, "generated %d service command files + commands.go\n", len(allServices))
+	// Collect unique import paths for the registry.
+	importSet := make(map[string]bool)
+
+	for _, cfg := range serviceConfigs {
+		importSet[cfg.goImportPath] = true
+	}
+
+	var imports []string
+
+	for imp := range importSet {
+		imports = append(imports, imp)
+	}
+
+	sort.Strings(imports)
+
+	if err := renderFile(tmpl, "registry.go.tmpl",
+		registryTmplData{Services: allServices, Imports: imports}, "registry.go"); err != nil {
+		fmt.Fprintf(os.Stderr, "render registry: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Fprintf(os.Stderr, "generated %d service command files + commands.go + registry.go\n", len(allServices))
 }
 
 func renderFile(tmpl *template.Template, name string, data any, outFile string) error {

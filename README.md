@@ -124,6 +124,130 @@ Pass `--fmt-toon` to read and write
 elephant --fmt-toon documents get --uuid 7a3f08c1-b252-4b4a-af3e-b9301ed3b05a
 ```
 
+### JSON Schemas
+
+Every method command supports `--req-schema` and `--res-schema` to print the
+JSON Schema for the request and response messages:
+
+```sh
+elephant documents get --req-schema
+elephant documents get --res-schema
+```
+
+## MCP server
+
+The `mcp` command runs a [Model Context Protocol](https://modelcontextprotocol.io/)
+server that exposes the elephant-api to AI assistants like Claude. The `--env`
+and `--scopes` flags control which environment and permissions the assistant gets.
+
+### Tools exposed
+
+| Tool | Description |
+|------|-------------|
+| `elephant_list_services` | List all services and methods for discovery |
+| `elephant_search_methods` | Search methods by keyword in names and descriptions |
+| `elephant_get_schema` | Get the JSON Schema for a method's request or response |
+| `elephant_call` | Invoke an API method with a JSON payload |
+
+### Registering with Claude Code (stdio)
+
+Register the MCP server as a stdio process. The `--env` and `--scopes` flags
+are passed directly to control access:
+
+```sh
+# Read-only access to production (default scopes)
+claude mcp add --scope user elephant-prod -- elephant --env prod mcp
+
+# Read-write access to staging
+claude mcp add --scope user elephant-stage -- \
+  elephant --env stage --scopes doc_read --scopes doc_write --scopes search mcp
+```
+
+### Registering with Claude Code (HTTP)
+
+Run the MCP server as a shared HTTP service, then point Claude at it:
+
+```sh
+# Start the server (in a terminal or as a service)
+elephant --env stage mcp --http :8080
+
+# Register the HTTP endpoint
+claude mcp add --scope user --transport http elephant-stage http://localhost:8080/
+```
+
+### Project-specific `.mcp.json`
+
+Add an `.mcp.json` file to a project root to automatically configure the MCP
+server for that project. This is useful for giving Claude project-specific
+access with appropriate scopes:
+
+```json
+{
+  "mcpServers": {
+    "elephant-prod": {
+      "command": "elephant",
+      "args": ["--env", "prod", "--scopes", "doc_read", "--scopes", "search", "mcp"]
+    }
+  }
+}
+```
+
+For read-write access:
+
+```json
+{
+  "mcpServers": {
+    "elephant-stage": {
+      "command": "elephant",
+      "args": [
+        "--env", "stage",
+        "--scopes", "doc_read",
+        "--scopes", "doc_write",
+        "--scopes", "schema_read",
+        "--scopes", "search",
+        "mcp"
+      ]
+    }
+  }
+}
+```
+
+For an HTTP server:
+
+```json
+{
+  "mcpServers": {
+    "elephant-stage": {
+      "type": "http",
+      "url": "http://localhost:8080/"
+    }
+  }
+}
+```
+
+### Access control
+
+The scopes you pass determine what the AI assistant can do:
+
+| Scope | Grants |
+|-------|--------|
+| `doc_read` | Read documents |
+| `doc_write` | Create and update documents |
+| `doc_delete` | Delete documents |
+| `schema_read` | Read schemas |
+| `schema_admin` | Manage schemas |
+| `eventlog_read` | Read the event log |
+| `metrics_read` | Read metrics |
+| `search` | Search the index |
+| `user` | Access user settings and messages |
+| `spell_write` | Manage spell check dictionaries |
+| `workflow_admin` | Manage workflows |
+| `index_admin` | Manage index clusters and sets |
+
+The default scopes (`doc_read`, `eventlog_read`, `metrics_read`, `schema_read`,
+`search`, `user`) provide read-only access. This is the safest starting point
+for AI assistants.
+
 ## Code generation
 
 The generated service commands are produced by `cmd/generate-cli`, which uses
