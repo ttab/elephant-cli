@@ -27,7 +27,7 @@ func metricsServiceCommand() *cli.Command {
 func metricsRegisterKindCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "register-kind",
-		Usage: "Call Metrics.RegisterKind",
+		Usage: "Register a metric kind",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "name"},
 			&cli.StringFlag{Name: "aggregation", Usage: "values: NONE, REPLACE, INCREMENT"},
@@ -70,7 +70,7 @@ func metricsRegisterKindCommand() *cli.Command {
 func metricsDeleteKindCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "delete-kind",
-		Usage: "Call Metrics.DeleteKind",
+		Usage: "Delete a metric kind",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "name"},
 		}, fileFlag()...),
@@ -104,7 +104,7 @@ func metricsDeleteKindCommand() *cli.Command {
 func metricsGetKindsCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-kinds",
-		Usage: "Call Metrics.GetKinds",
+		Usage: "List all metric kinds",
 		Flags: append([]cli.Flag{}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -133,7 +133,7 @@ func metricsGetKindsCommand() *cli.Command {
 func metricsRegisterMetricCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "register-metric",
-		Usage: "Call Metrics.RegisterMetric",
+		Usage: "Register a data point",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "uuid"},
 			&cli.StringFlag{Name: "kind"},
@@ -173,10 +173,10 @@ func metricsRegisterMetricCommand() *cli.Command {
 func metricsGetMetricsCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-metrics",
-		Usage: "Call Metrics.GetMetrics",
+		Usage: "GetMetrics returns metrics related to a document.",
 		Flags: append([]cli.Flag{
-			&cli.StringSliceFlag{Name: "uuids"},
-			&cli.StringSliceFlag{Name: "kinds"},
+			&cli.StringSliceFlag{Name: "uuids", Usage: "The documents to get metrics for."},
+			&cli.StringSliceFlag{Name: "kinds", Usage: "The metric kinds to get. Optional, defaults to all."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")

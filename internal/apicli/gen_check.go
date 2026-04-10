@@ -13,7 +13,7 @@ import (
 func checkServiceCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "check",
-		Usage: "Check service commands",
+		Usage: "Check content for spelling errors.",
 		Commands: []*cli.Command{
 			checkTextCommand(),
 			checkSuggestionsCommand(),
@@ -24,11 +24,11 @@ func checkServiceCommand() *cli.Command {
 func checkTextCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "text",
-		Usage: "Call Check.Text",
+		Usage: "Text spellchecks a text and returns the misspelled words or phrases.",
 		Flags: append([]cli.Flag{
-			&cli.StringSliceFlag{Name: "text"},
-			&cli.StringFlag{Name: "language"},
-			&cli.BoolFlag{Name: "suggestions"},
+			&cli.StringSliceFlag{Name: "text", Usage: "Text to spellcheck."},
+			&cli.StringFlag{Name: "language", Usage: "Language to check the text for."},
+			&cli.BoolFlag{Name: "suggestions", Usage: "Suggestions enables generation of suggestions for misspelled words. In interactive applications this should normally be done by calling the Suggestions method on demand."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "spell")
@@ -64,10 +64,10 @@ func checkTextCommand() *cli.Command {
 func checkSuggestionsCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "suggestions",
-		Usage: "Call Check.Suggestions",
+		Usage: "Suggestions returns suggestions for a word or phrase.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "text"},
-			&cli.StringFlag{Name: "language"},
+			&cli.StringFlag{Name: "text", Usage: "Text is the word or phrase to get suggestions for."},
+			&cli.StringFlag{Name: "language", Usage: "Language to get suggestions in."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "spell")

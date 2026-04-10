@@ -35,7 +35,7 @@ func schemasServiceCommand() *cli.Command {
 func schemasRegisterCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "register",
-		Usage: "Call Schemas.Register",
+		Usage: "Register register a new validation schema version.",
 		Flags: fileFlag(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -64,11 +64,11 @@ func schemasRegisterCommand() *cli.Command {
 func schemasSetActiveCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "set-active",
-		Usage: "Call Schemas.SetActive",
+		Usage: "SetActive activates schema versions.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "name"},
-			&cli.StringFlag{Name: "version"},
-			&cli.BoolFlag{Name: "deactivate"},
+			&cli.StringFlag{Name: "name", Usage: "Name is the name of the schema to activate or deactivate, required."},
+			&cli.StringFlag{Name: "version", Usage: "Version of the schema to activate, required when activating a new version."},
+			&cli.BoolFlag{Name: "deactivate", Usage: "Deactivate is used to disable a schema, activate new schema versions instead if you want to start using a new version."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -102,10 +102,10 @@ func schemasSetActiveCommand() *cli.Command {
 func schemasGetCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get",
-		Usage: "Call Schemas.Get",
+		Usage: "Get retrieves a schema.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "name"},
-			&cli.StringFlag{Name: "version"},
+			&cli.StringFlag{Name: "name", Usage: "Name of the schema to get."},
+			&cli.StringFlag{Name: "version", Usage: "Version of the schema to get, optional. The currently active version of the schema will be returned if no version is specified."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -138,11 +138,11 @@ func schemasGetCommand() *cli.Command {
 func schemasGetAllActiveCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-all-active",
-		Usage: "Call Schemas.GetAllActive",
+		Usage: "GetAllActiveSchemas returns the currently active schemas.",
 		Flags: append([]cli.Flag{
-			&cli.Int64Flag{Name: "wait-seconds"},
-			&cli.StringMapFlag{Name: "known"},
-			&cli.BoolFlag{Name: "only-changed"},
+			&cli.Int64Flag{Name: "wait-seconds", Usage: "WaitSeconds is the maximum number of seconds to wait for changes, defaults to 10 seconds. Optional."},
+			&cli.StringMapFlag{Name: "known", Usage: "Known schema versions that the client already has. Optional."},
+			&cli.BoolFlag{Name: "only-changed", Usage: "OnlyChanged only returns the schemas that have been changed."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -178,7 +178,7 @@ func schemasGetAllActiveCommand() *cli.Command {
 func schemasListActiveCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "list-active",
-		Usage: "Call Schemas.ListActive",
+		Usage: "ListActiveSchemas lists the currently active schemas.",
 		Flags: append([]cli.Flag{}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -207,10 +207,10 @@ func schemasListActiveCommand() *cli.Command {
 func schemasRegisterMetaTypeCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "register-meta-type",
-		Usage: "Call Schemas.RegisterMetaType",
+		Usage: "RegisterMetaType registers a type that can be used for meta documents.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "type"},
-			&cli.BoolFlag{Name: "exclusive"},
+			&cli.StringFlag{Name: "type", Usage: "Type to use as a meta type."},
+			&cli.BoolFlag{Name: "exclusive", Usage: "Exclusive - set to true to only allow the type to be used as a meta type."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -243,10 +243,10 @@ func schemasRegisterMetaTypeCommand() *cli.Command {
 func schemasRegisterMetaTypeUseCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "register-meta-type-use",
-		Usage: "Call Schemas.RegisterMetaTypeUse",
+		Usage: "RegisterMetaTypeUse registers a meta type for use with a main type.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "main-type"},
-			&cli.StringFlag{Name: "meta-type"},
+			&cli.StringFlag{Name: "main-type", Usage: "MainType to use the meta type for."},
+			&cli.StringFlag{Name: "meta-type", Usage: "MetaType to use for the main document."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -279,7 +279,7 @@ func schemasRegisterMetaTypeUseCommand() *cli.Command {
 func schemasGetDeprecationsCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-deprecations",
-		Usage: "Call Schemas.GetDeprecations",
+		Usage: "GetDeprecations lists all deprecations.",
 		Flags: append([]cli.Flag{}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -308,7 +308,7 @@ func schemasGetDeprecationsCommand() *cli.Command {
 func schemasUpdateDeprecationCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "update-deprecation",
-		Usage: "Call Schemas.UpdateDeprecation",
+		Usage: "UpdateDeprecation creates or updates a deprecation.",
 		Flags: fileFlag(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -337,7 +337,7 @@ func schemasUpdateDeprecationCommand() *cli.Command {
 func schemasGetMetaTypesCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-meta-types",
-		Usage: "Call Schemas.GetMetaTypes",
+		Usage: "GetMetaTypes lists the registered meta types.",
 		Flags: append([]cli.Flag{}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -366,7 +366,7 @@ func schemasGetMetaTypesCommand() *cli.Command {
 func schemasGetDocumentTypesCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-document-types",
-		Usage: "Call Schemas.GetDocumentTypes",
+		Usage: "GetDocumentTypes lists the defined document types.",
 		Flags: append([]cli.Flag{}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -395,7 +395,7 @@ func schemasGetDocumentTypesCommand() *cli.Command {
 func schemasConfigureTypeCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "configure-type",
-		Usage: "Call Schemas.ConfigureType",
+		Usage: "ConfigureType configures a document type.",
 		Flags: fileFlag(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -424,9 +424,9 @@ func schemasConfigureTypeCommand() *cli.Command {
 func schemasGetTypeConfigurationCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-type-configuration",
-		Usage: "Call Schemas.GetTypeConfiguration",
+		Usage: "GetTypeConfiguration returns the current configuration for a type.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "type"},
+			&cli.StringFlag{Name: "type", Usage: "Type to get configuration for."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")

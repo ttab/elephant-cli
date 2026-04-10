@@ -13,7 +13,7 @@ import (
 func {{.FuncPrefix}}ServiceCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "{{.CLIName}}",
-		Usage: "{{.ServiceName}} service commands",
+		Usage: {{if .ServiceUsage}}"{{.ServiceUsage}}"{{else}}"{{.ServiceName}} service commands"{{end}},
 		Commands: []*cli.Command{
 			{{- range .Methods}}
 			{{$.FuncPrefix}}{{.GoName}}Command(),
@@ -26,7 +26,7 @@ func {{.FuncPrefix}}ServiceCommand() *cli.Command {
 func {{$.FuncPrefix}}{{.GoName}}Command() *cli.Command {
 	return &cli.Command{
 		Name:  "{{.CLIName}}",
-		Usage: "Call {{$.ServiceName}}.{{.GoName}}",
+		Usage: {{if .Usage}}"{{.Usage}}"{{else}}"Call {{$.ServiceName}}.{{.GoName}}"{{end}},
 		Flags: {{if .AllFlaggable}}append([]cli.Flag{
 			{{- range .Fields}}{{if .FlagEligible}}
 			{{.FlagDef}},

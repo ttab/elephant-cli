@@ -13,7 +13,7 @@ import (
 func settingsServiceCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "settings",
-		Usage: "Settings service commands",
+		Usage: "Settings service manages configuration for authenticated users.  All methods in this service rely on the `sub` claim from the authentication (bearer) token to identify the target user.",
 		Commands: []*cli.Command{
 			settingsGetDocumentCommand(),
 			settingsListDocumentsCommand(),
@@ -30,12 +30,12 @@ func settingsServiceCommand() *cli.Command {
 func settingsGetDocumentCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-document",
-		Usage: "Call Settings.GetDocument",
+		Usage: "Gets a specific document for the authenticated user.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "owner"},
-			&cli.StringFlag{Name: "application"},
-			&cli.StringFlag{Name: "type"},
-			&cli.StringFlag{Name: "key"},
+			&cli.StringFlag{Name: "owner", Usage: "URI of the document owner. Optional, defaults to the caller URI (`sub` claim). Can be a user, unit or organization. (e.g., core://user/1234, core://unit/abc, core://org/ab)"},
+			&cli.StringFlag{Name: "application", Usage: "The unique application identifier in reverse domain notation (e.g., `com.example.assignments` or `com.example.writer`)."},
+			&cli.StringFlag{Name: "type", Usage: "Type is the content type of the document."},
+			&cli.StringFlag{Name: "key", Usage: "Unique identifier for the document within the scope of the application and type. Can be a human readable slug or a UUID."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "user")
@@ -70,11 +70,11 @@ func settingsGetDocumentCommand() *cli.Command {
 func settingsListDocumentsCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "list-documents",
-		Usage: "Call Settings.ListDocuments",
+		Usage: "Lists documents for the authenticated user.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "application"},
-			&cli.StringFlag{Name: "type"},
-			&cli.BoolFlag{Name: "include-payload"},
+			&cli.StringFlag{Name: "application", Usage: "The unique application identifier in reverse domain notation (e.g., `com.example.assignments` or `com.example.writer`). If empty, returns documents across all applications."},
+			&cli.StringFlag{Name: "type", Usage: "Type is the content type of the document. If provided, filters documents by type. If `application` is empty, returns documents of this type across all applications."},
+			&cli.BoolFlag{Name: "include-payload", Usage: "If true, include the document payload in the response. If false (default), payload will be omitted."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "user")
@@ -108,7 +108,7 @@ func settingsListDocumentsCommand() *cli.Command {
 func settingsUpdateDocumentCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "update-document",
-		Usage: "Call Settings.UpdateDocument",
+		Usage: "Updates an existing or creates a new document for the authenticated user.",
 		Flags: fileFlag(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "user")
@@ -137,12 +137,12 @@ func settingsUpdateDocumentCommand() *cli.Command {
 func settingsDeleteDocumentCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "delete-document",
-		Usage: "Call Settings.DeleteDocument",
+		Usage: "Deletes a document for the authenticated user.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "owner"},
-			&cli.StringFlag{Name: "application"},
-			&cli.StringFlag{Name: "type"},
-			&cli.StringFlag{Name: "key"},
+			&cli.StringFlag{Name: "owner", Usage: "URI of the document owner. If omitted, defaults to the caller URI (`sub` claim). Can be a user, unit or organization. (e.g., core://user/1234, core://unit/abc, core://org/ab) Only admin users can delete documents owned by a unit or organization."},
+			&cli.StringFlag{Name: "application", Usage: "The unique application identifier in reverse domain notation (e.g., `com.example.assignments` or `com.example.writer`)."},
+			&cli.StringFlag{Name: "type", Usage: "Type is the content type of the document."},
+			&cli.StringFlag{Name: "key", Usage: "Unique identifier for the document within the scope of the application and type. Can be a human readable slug or a UUID."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "user")
@@ -177,10 +177,10 @@ func settingsDeleteDocumentCommand() *cli.Command {
 func settingsGetPropertiesCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-properties",
-		Usage: "Call Settings.GetProperties",
+		Usage: "Gets properties for the authenticated user.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "application"},
-			&cli.StringSliceFlag{Name: "keys"},
+			&cli.StringFlag{Name: "application", Usage: "The unique application identifier in reverse domain notation (e.g., `com.example.assignments` or `com.example.writer`). If empty, returns properties across all applications."},
+			&cli.StringSliceFlag{Name: "keys", Usage: "Unique identifier(s) for the property. If provided, filters properties by key. If `application` is empty, returns properties with these keys across all applications."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "user")
@@ -215,7 +215,7 @@ func settingsGetPropertiesCommand() *cli.Command {
 func settingsSetPropertiesCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "set-properties",
-		Usage: "Call Settings.SetProperties",
+		Usage: "Sets or updates properties for the authenticated user.",
 		Flags: fileFlag(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "user")
@@ -244,7 +244,7 @@ func settingsSetPropertiesCommand() *cli.Command {
 func settingsDeletePropertiesCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "delete-properties",
-		Usage: "Call Settings.DeleteProperties",
+		Usage: "Deletes properties for the authenticated user.",
 		Flags: fileFlag(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "user")
@@ -273,9 +273,9 @@ func settingsDeletePropertiesCommand() *cli.Command {
 func settingsPollEventLogCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "poll-event-log",
-		Usage: "Call Settings.PollEventLog",
+		Usage: "Polls for a stream of changes (creates, updates, deletes) for both documents and properties for the authenticated user.",
 		Flags: append([]cli.Flag{
-			&cli.Int64Flag{Name: "after-id"},
+			&cli.Int64Flag{Name: "after-id", Usage: "ID of the event after which to start returning events. Set to -1 for the initial request."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "user")

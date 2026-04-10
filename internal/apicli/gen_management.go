@@ -30,7 +30,7 @@ func managementServiceCommand() *cli.Command {
 func managementRegisterClusterCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "register-cluster",
-		Usage: "Call Management.RegisterCluster",
+		Usage: "RegisterCluster for use with index sets.",
 		Flags: fileFlag(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "index")
@@ -59,7 +59,7 @@ func managementRegisterClusterCommand() *cli.Command {
 func managementListClustersCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "list-clusters",
-		Usage: "Call Management.ListClusters",
+		Usage: "ListClusters returns a list of clusters together with information about the number of index sets they contain.",
 		Flags: append([]cli.Flag{}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "index")
@@ -88,9 +88,9 @@ func managementListClustersCommand() *cli.Command {
 func managementDeleteClusterCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "delete-cluster",
-		Usage: "Call Management.DeleteCluster",
+		Usage: "DeleteCluster deletes a registered cluster. A cluster cannot be deleted as long as it has associated index sets.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "name"},
+			&cli.StringFlag{Name: "name", Usage: "Name of the cluster to delete."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "index")
@@ -122,9 +122,9 @@ func managementDeleteClusterCommand() *cli.Command {
 func managementDeleteIndexSetCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "delete-index-set",
-		Usage: "Call Management.DeleteIndexSet",
+		Usage: "DeleteIndexSet deletes an index set. The set cannot be active or enabled.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "name"},
+			&cli.StringFlag{Name: "name", Usage: "Name of the index set to delete."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "index")
@@ -156,9 +156,9 @@ func managementDeleteIndexSetCommand() *cli.Command {
 func managementReindexCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "reindex",
-		Usage: "Call Management.Reindex",
+		Usage: "Reindex set creates a new index set in the specified cluster and starts indexing documents to it.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "cluster"},
+			&cli.StringFlag{Name: "cluster", Usage: "Cluster that we should re-index set to."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "index")
@@ -190,10 +190,10 @@ func managementReindexCommand() *cli.Command {
 func managementPartialReindexCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "partial-reindex",
-		Usage: "Call Management.PartialReindex",
+		Usage: "PartialReindex restarts an existing index set from a given point in the repository eventlog.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "index-set"},
-			&cli.Int64Flag{Name: "position"},
+			&cli.StringFlag{Name: "index-set", Usage: "IndexSet to re-index."},
+			&cli.Int64Flag{Name: "position", Usage: "Position to start from."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "index")
@@ -226,12 +226,12 @@ func managementPartialReindexCommand() *cli.Command {
 func managementListIndexSetsCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "list-index-sets",
-		Usage: "Call Management.ListIndexSets",
+		Usage: "ListIndexSets lists the available index set, with optional filtering.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "cluster"},
-			&cli.BoolFlag{Name: "only-active"},
-			&cli.StringFlag{Name: "status", Usage: "values: STATUS_UNSPECIFIED, STATUS_ENABLED, STATUS_DISABLED"},
-			&cli.StringFlag{Name: "cursor"},
+			&cli.StringFlag{Name: "cluster", Usage: "Cluster can be used to filter by cluster."},
+			&cli.BoolFlag{Name: "only-active", Usage: "OnlyActive only returns the currently active index set."},
+			&cli.StringFlag{Name: "status", Usage: "Status can be used to filter index sets by their enabled/disabled status. (values: STATUS_UNSPECIFIED, STATUS_ENABLED, STATUS_DISABLED)"},
+			&cli.StringFlag{Name: "cursor", Usage: "Cursor to the page that should be returned. Omit to get the first page."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "index")
@@ -273,12 +273,12 @@ func managementListIndexSetsCommand() *cli.Command {
 func managementSetIndexSetStatusCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "set-index-set-status",
-		Usage: "Call Management.SetIndexSetStatus",
+		Usage: "SetIndexSetStatus is used to change the status of an index set.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "name"},
-			&cli.BoolFlag{Name: "active"},
-			&cli.BoolFlag{Name: "force-active"},
-			&cli.BoolFlag{Name: "enabled"},
+			&cli.StringFlag{Name: "name", Usage: "Name of the index set to set the status of."},
+			&cli.BoolFlag{Name: "active", Usage: "Active means that search requests are being routed to this index set. There is always exactly one active index set at a time. Setting an index set to active will deactivate but not disable the currently active index set."},
+			&cli.BoolFlag{Name: "force-active", Usage: "ForceActive is used to force the activation of an index set that lags more than 10 events behind the currently active set."},
+			&cli.BoolFlag{Name: "enabled", Usage: "Enabled means that documents should index to the index set. Disabling an index set will only pause index seting, and it can later be resumed. Disabling an index set does not deactivate it."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "index")

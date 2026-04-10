@@ -1,12 +1,16 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"embed"
+	"encoding/json"
 	"fmt"
 	"go/format"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"text/template"
 	"unicode"
@@ -70,6 +74,7 @@ type serviceTmplData struct {
 	GoAlias      string
 	Endpoint     string
 	ServiceName  string
+	ServiceUsage string
 	CLIName      string
 	FuncPrefix   string
 	Methods      []methodTmplData
@@ -78,6 +83,7 @@ type serviceTmplData struct {
 type methodTmplData struct {
 	GoName       string
 	CLIName      string
+	Usage        string
 	InputType    string
 	OutputType   string
 	AllFlaggable bool
@@ -106,6 +112,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	apiDir, err := findModuleDir("github.com/ttab/elephant-api")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "find elephant-api module: %v\n", err)
+		os.Exit(1)
+	}
+
 	var allServices []serviceTmplData
 
 	for _, cfg := range serviceConfigs {
@@ -115,11 +127,17 @@ func main() {
 			os.Exit(1)
 		}
 
+		comments, err := parseProtoComments(filepath.Join(apiDir, cfg.protoFile))
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "parse proto comments %s: %v\n", cfg.protoFile, err)
+			os.Exit(1)
+		}
+
 		services := fd.Services()
 
 		for i := range services.Len() {
 			sd := services.Get(i)
-			svc := processService(cfg, sd)
+			svc := processService(cfg, sd, comments)
 			allServices = append(allServices, svc)
 
 			if err := renderFile(tmpl, "service.go.tmpl", svc,
@@ -163,7 +181,7 @@ func renderFile(tmpl *template.Template, name string, data any, outFile string) 
 	return nil
 }
 
-func processService(cfg serviceConfig, sd protoreflect.ServiceDescriptor) serviceTmplData {
+func processService(cfg serviceConfig, sd protoreflect.ServiceDescriptor, comments commentMap) serviceTmplData {
 	serviceName := string(sd.Name())
 
 	svc := serviceTmplData{
@@ -171,6 +189,7 @@ func processService(cfg serviceConfig, sd protoreflect.ServiceDescriptor) servic
 		GoAlias:      cfg.goAlias,
 		Endpoint:     cfg.endpoint,
 		ServiceName:  serviceName,
+		ServiceUsage: comments.get(serviceName),
 		CLIName:      camelToKebab(serviceName),
 		FuncPrefix:   unexport(serviceName),
 	}
@@ -179,13 +198,13 @@ func processService(cfg serviceConfig, sd protoreflect.ServiceDescriptor) servic
 
 	for i := range methods.Len() {
 		md := methods.Get(i)
-		svc.Methods = append(svc.Methods, processMethod(cfg, md))
+		svc.Methods = append(svc.Methods, processMethod(cfg, sd, md, comments))
 	}
 
 	return svc
 }
 
-func processMethod(cfg serviceConfig, md protoreflect.MethodDescriptor) methodTmplData {
+func processMethod(cfg serviceConfig, sd protoreflect.ServiceDescriptor, md protoreflect.MethodDescriptor, comments commentMap) methodTmplData {
 	methodName := string(md.Name())
 	inputDesc := md.Input()
 	outputDesc := md.Output()
@@ -193,6 +212,7 @@ func processMethod(cfg serviceConfig, md protoreflect.MethodDescriptor) methodTm
 	m := methodTmplData{
 		GoName:     methodName,
 		CLIName:    camelToKebab(methodName),
+		Usage:      comments.get(string(sd.Name()) + "." + methodName),
 		InputType:  string(inputDesc.Name()),
 		OutputType: string(outputDesc.Name()),
 	}
@@ -202,7 +222,7 @@ func processMethod(cfg serviceConfig, md protoreflect.MethodDescriptor) methodTm
 
 	for i := range fields.Len() {
 		fd := fields.Get(i)
-		f := processField(cfg, fd)
+		f := processField(cfg, fd, comments)
 		m.Fields = append(m.Fields, f)
 
 		if !f.FlagEligible {
@@ -215,13 +235,16 @@ func processMethod(cfg serviceConfig, md protoreflect.MethodDescriptor) methodTm
 	return m
 }
 
-func processField(cfg serviceConfig, fd protoreflect.FieldDescriptor) fieldTmplData {
+func processField(cfg serviceConfig, fd protoreflect.FieldDescriptor, comments commentMap) fieldTmplData {
 	protoName := string(fd.Name())
 	flagName := snakeToKebab(protoName)
 	goName := snakeToGoName(protoName)
+	msgName := string(fd.Parent().Name())
+	usage := comments.get(msgName + "." + protoName)
 
 	f := fieldTmplData{
 		FlagName: flagName,
+		Usage:    usage,
 	}
 
 	// Handle maps.
@@ -232,7 +255,7 @@ func processField(cfg serviceConfig, fd protoreflect.FieldDescriptor) fieldTmplD
 		if keyKind == protoreflect.StringKind && valKind == protoreflect.StringKind {
 			f.FlagEligible = true
 			f.FlagType = "StringMapFlag"
-			f.FlagDef = stringMapFlagDef(flagName)
+			f.FlagDef = flagDef("StringMapFlag", flagName, usage)
 			f.AssignCode = fmt.Sprintf(
 				"if v := cmd.StringMap(%q); len(v) > 0 {\n\treq.%s = v\n}",
 				flagName, goName)
@@ -246,7 +269,7 @@ func processField(cfg serviceConfig, fd protoreflect.FieldDescriptor) fieldTmplD
 		if fd.Kind() == protoreflect.StringKind {
 			f.FlagEligible = true
 			f.FlagType = "StringSliceFlag"
-			f.FlagDef = stringSliceFlagDef(flagName)
+			f.FlagDef = flagDef("StringSliceFlag", flagName, usage)
 			f.AssignCode = fmt.Sprintf(
 				"if v := cmd.StringSlice(%q); len(v) > 0 {\n\treq.%s = v\n}",
 				flagName, goName)
@@ -260,49 +283,49 @@ func processField(cfg serviceConfig, fd protoreflect.FieldDescriptor) fieldTmplD
 	case protoreflect.StringKind:
 		f.FlagEligible = true
 		f.FlagType = "StringFlag"
-		f.FlagDef = simpleFlagDef("StringFlag", flagName, "")
+		f.FlagDef = flagDef("StringFlag", flagName, usage)
 		f.AssignCode = fmt.Sprintf("req.%s = cmd.String(%q)", goName, flagName)
 
 	case protoreflect.Int64Kind, protoreflect.Sint64Kind, protoreflect.Sfixed64Kind:
 		f.FlagEligible = true
 		f.FlagType = "Int64Flag"
-		f.FlagDef = simpleFlagDef("Int64Flag", flagName, "")
+		f.FlagDef = flagDef("Int64Flag", flagName, usage)
 		f.AssignCode = fmt.Sprintf("req.%s = cmd.Int64(%q)", goName, flagName)
 
 	case protoreflect.Int32Kind, protoreflect.Sint32Kind, protoreflect.Sfixed32Kind:
 		f.FlagEligible = true
 		f.FlagType = "Int64Flag"
-		f.FlagDef = simpleFlagDef("Int64Flag", flagName, "")
+		f.FlagDef = flagDef("Int64Flag", flagName, usage)
 		f.AssignCode = fmt.Sprintf("req.%s = int32(cmd.Int64(%q))", goName, flagName)
 
 	case protoreflect.Uint64Kind, protoreflect.Fixed64Kind:
 		f.FlagEligible = true
 		f.FlagType = "Uint64Flag"
-		f.FlagDef = simpleFlagDef("Uint64Flag", flagName, "")
+		f.FlagDef = flagDef("Uint64Flag", flagName, usage)
 		f.AssignCode = fmt.Sprintf("req.%s = cmd.Uint64(%q)", goName, flagName)
 
 	case protoreflect.Uint32Kind, protoreflect.Fixed32Kind:
 		f.FlagEligible = true
 		f.FlagType = "Uint64Flag"
-		f.FlagDef = simpleFlagDef("Uint64Flag", flagName, "")
+		f.FlagDef = flagDef("Uint64Flag", flagName, usage)
 		f.AssignCode = fmt.Sprintf("req.%s = uint32(cmd.Uint64(%q))", goName, flagName)
 
 	case protoreflect.BoolKind:
 		f.FlagEligible = true
 		f.FlagType = "BoolFlag"
-		f.FlagDef = simpleFlagDef("BoolFlag", flagName, "")
+		f.FlagDef = flagDef("BoolFlag", flagName, usage)
 		f.AssignCode = fmt.Sprintf("req.%s = cmd.Bool(%q)", goName, flagName)
 
 	case protoreflect.DoubleKind:
 		f.FlagEligible = true
 		f.FlagType = "FloatFlag"
-		f.FlagDef = simpleFlagDef("FloatFlag", flagName, "")
+		f.FlagDef = flagDef("FloatFlag", flagName, usage)
 		f.AssignCode = fmt.Sprintf("req.%s = cmd.Float(%q)", goName, flagName)
 
 	case protoreflect.FloatKind:
 		f.FlagEligible = true
 		f.FlagType = "FloatFlag"
-		f.FlagDef = simpleFlagDef("FloatFlag", flagName, "")
+		f.FlagDef = flagDef("FloatFlag", flagName, usage)
 		f.AssignCode = fmt.Sprintf("req.%s = float32(cmd.Float(%q))", goName, flagName)
 
 	case protoreflect.EnumKind:
@@ -313,8 +336,12 @@ func processField(cfg serviceConfig, fd protoreflect.FieldDescriptor) fieldTmplD
 		enumGoType := enumGoType(enumDesc, cfg.goAlias)
 		values := enumValueNames(enumDesc)
 
-		f.FlagDef = simpleFlagDef("StringFlag", flagName,
-			fmt.Sprintf("values: %s", strings.Join(values, ", ")))
+		enumUsage := fmt.Sprintf("values: %s", strings.Join(values, ", "))
+		if usage != "" {
+			enumUsage = usage + " (" + enumUsage + ")"
+		}
+
+		f.FlagDef = flagDef("StringFlag", flagName, enumUsage)
 		f.AssignCode = enumAssignCode(flagName, goName, enumGoType, cfg.goAlias, enumDesc)
 
 	default:
@@ -325,20 +352,12 @@ func processField(cfg serviceConfig, fd protoreflect.FieldDescriptor) fieldTmplD
 	return f
 }
 
-func simpleFlagDef(flagType, name, usage string) string {
+func flagDef(flagType, name, usage string) string {
 	if usage != "" {
 		return fmt.Sprintf("&cli.%s{Name: %q, Usage: %q}", flagType, name, usage)
 	}
 
 	return fmt.Sprintf("&cli.%s{Name: %q}", flagType, name)
-}
-
-func stringSliceFlagDef(name string) string {
-	return fmt.Sprintf("&cli.StringSliceFlag{Name: %q}", name)
-}
-
-func stringMapFlagDef(name string) string {
-	return fmt.Sprintf("&cli.StringMapFlag{Name: %q}", name)
 }
 
 func enumGoType(ed protoreflect.EnumDescriptor, pkgAlias string) string {
@@ -436,4 +455,142 @@ func unexport(s string) string {
 	}
 
 	return strings.ToLower(s[:1]) + s[1:]
+}
+
+// --- Proto comment parsing ---
+
+// commentMap maps "Scope.Name" to the associated comment text.
+// Examples: "Documents" (service), "Documents.Get" (method),
+// "GetDocumentRequest.uuid" (field).
+type commentMap map[string]string
+
+func (m commentMap) get(key string) string {
+	if m == nil {
+		return ""
+	}
+
+	return m[key]
+}
+
+var (
+	serviceRe = regexp.MustCompile(`^\s*service\s+(\w+)`)
+	messageRe = regexp.MustCompile(`^\s*message\s+(\w+)`)
+	rpcRe     = regexp.MustCompile(`^\s*rpc\s+(\w+)`)
+	fieldRe   = regexp.MustCompile(`\s(\w+)\s*=\s*\d+`)
+)
+
+// parseProtoComments reads a .proto source file and extracts leading comments
+// for services, methods, messages, and fields.
+func parseProtoComments(path string) (commentMap, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, fmt.Errorf("open %s: %w", path, err)
+	}
+
+	defer func() { _ = f.Close() }()
+
+	result := make(commentMap)
+
+	var (
+		commentBuf []string
+		depth      int
+		scope      []string // stack of service/message names
+	)
+
+	scanner := bufio.NewScanner(f)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		trimmed := strings.TrimSpace(line)
+
+		// Accumulate comment lines.
+		if strings.HasPrefix(trimmed, "//") {
+			text := strings.TrimPrefix(trimmed, "//")
+			text = strings.TrimPrefix(text, " ")
+			commentBuf = append(commentBuf, text)
+
+			continue
+		}
+
+		comment := strings.Join(commentBuf, " ")
+		commentBuf = nil
+
+		// Skip blank lines and lines that are just braces.
+		if trimmed == "" || trimmed == "}" || trimmed == "{" {
+			// Adjust depth for lone braces.
+			depth += strings.Count(trimmed, "{") - strings.Count(trimmed, "}")
+
+			for len(scope) > depth {
+				scope = scope[:len(scope)-1]
+			}
+
+			continue
+		}
+
+		// Detect declarations.
+		switch {
+		case serviceRe.MatchString(trimmed):
+			name := serviceRe.FindStringSubmatch(trimmed)[1]
+			if comment != "" {
+				result[name] = comment
+			}
+
+			scope = append(scope, name)
+		case messageRe.MatchString(trimmed):
+			name := messageRe.FindStringSubmatch(trimmed)[1]
+			if comment != "" {
+				result[name] = comment
+			}
+
+			scope = append(scope, name)
+		case rpcRe.MatchString(trimmed):
+			name := rpcRe.FindStringSubmatch(trimmed)[1]
+			if comment != "" && len(scope) > 0 {
+				result[scope[len(scope)-1]+"."+name] = comment
+			}
+		case fieldRe.MatchString(trimmed):
+			m := fieldRe.FindStringSubmatch(trimmed)
+			name := m[1]
+
+			if comment != "" && len(scope) > 0 {
+				result[scope[len(scope)-1]+"."+name] = comment
+			}
+		}
+
+		// Update brace depth.
+		depth += strings.Count(trimmed, "{") - strings.Count(trimmed, "}")
+
+		for len(scope) > depth {
+			scope = scope[:len(scope)-1]
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, fmt.Errorf("scan %s: %w", path, err)
+	}
+
+	return result, nil
+}
+
+// findModuleDir returns the on-disk directory for a Go module dependency.
+func findModuleDir(modulePath string) (string, error) {
+	cmd := exec.Command("go", "list", "-m", "-json", modulePath)
+	out, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("go list -m -json %s: %w", modulePath, err)
+	}
+
+	var info struct {
+		Dir string
+	}
+
+	if err := json.Unmarshal(out, &info); err != nil {
+		return "", fmt.Errorf("parse module info: %w", err)
+	}
+
+	if info.Dir == "" {
+		return "", fmt.Errorf("module %s has no local directory", modulePath)
+	}
+
+	return info.Dir, nil
 }

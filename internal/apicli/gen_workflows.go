@@ -30,11 +30,11 @@ func workflowsServiceCommand() *cli.Command {
 func workflowsUpdateStatusCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "update-status",
-		Usage: "Call Workflows.UpdateStatus",
+		Usage: "UpdateStatus creates or updates a status that can be used for documents.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "type"},
-			&cli.StringFlag{Name: "name"},
-			&cli.BoolFlag{Name: "disabled"},
+			&cli.StringFlag{Name: "type", Usage: "Type that the status is valid for."},
+			&cli.StringFlag{Name: "name", Usage: "Name of the status."},
+			&cli.BoolFlag{Name: "disabled", Usage: "Disabled disables the status so that it cannot be used when setting new statuses."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -68,9 +68,9 @@ func workflowsUpdateStatusCommand() *cli.Command {
 func workflowsGetStatusesCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-statuses",
-		Usage: "Call Workflows.GetStatuses",
+		Usage: "GetStatuses lists all enabled statuses.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "type"},
+			&cli.StringFlag{Name: "type", Usage: "Type of documents to get statuses from."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -102,7 +102,7 @@ func workflowsGetStatusesCommand() *cli.Command {
 func workflowsCreateStatusRuleCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "create-status-rule",
-		Usage: "Call Workflows.CreateStatusRule",
+		Usage: "CreateStatusRule creates or updates a status rule that should be applied when setting statuses.",
 		Flags: fileFlag(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -131,7 +131,7 @@ func workflowsCreateStatusRuleCommand() *cli.Command {
 func workflowsDeleteStatusRuleCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "delete-status-rule",
-		Usage: "Call Workflows.DeleteStatusRule",
+		Usage: "DeleteStatusRule removes a status rule.",
 		Flags: append([]cli.Flag{
 			&cli.StringFlag{Name: "type"},
 			&cli.StringFlag{Name: "name"},
@@ -167,7 +167,7 @@ func workflowsDeleteStatusRuleCommand() *cli.Command {
 func workflowsGetStatusRulesCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-status-rules",
-		Usage: "Call Workflows.GetStatusRules",
+		Usage: "GetStatusRules returns all status rules.",
 		Flags: append([]cli.Flag{}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -196,7 +196,7 @@ func workflowsGetStatusRulesCommand() *cli.Command {
 func workflowsSetWorkflowCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "set-workflow",
-		Usage: "Call Workflows.SetWorkflow",
+		Usage: "SetWorkflow configures a workflow for a document type.",
 		Flags: fileFlag(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -225,9 +225,9 @@ func workflowsSetWorkflowCommand() *cli.Command {
 func workflowsGetWorkflowCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-workflow",
-		Usage: "Call Workflows.GetWorkflow",
+		Usage: "GetWorkflow for a document type.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "type"},
+			&cli.StringFlag{Name: "type", Usage: "Type of the document to get workflow for."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -259,9 +259,9 @@ func workflowsGetWorkflowCommand() *cli.Command {
 func workflowsDeleteWorkflowCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "delete-workflow",
-		Usage: "Call Workflows.DeleteWorkflow",
+		Usage: "DeleteWorkflow removes the workflow configuration for a document type.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "type"},
+			&cli.StringFlag{Name: "type", Usage: "Type of the document to remove the workflow for."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")

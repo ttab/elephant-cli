@@ -50,15 +50,15 @@ func documentsServiceCommand() *cli.Command {
 func documentsGetCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get",
-		Usage: "Call Documents.Get",
+		Usage: "Get retrieves a document version.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "uuid"},
-			&cli.Int64Flag{Name: "version"},
-			&cli.StringFlag{Name: "status"},
-			&cli.BoolFlag{Name: "lock"},
-			&cli.StringFlag{Name: "meta-document", Usage: "values: META_NONE, META_INCLUDE, META_ONLY"},
-			&cli.Int64Flag{Name: "meta-document-version"},
-			&cli.StringSliceFlag{Name: "subset"},
+			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to get."},
+			&cli.Int64Flag{Name: "version", Usage: "Version to get, omit to get latest (or use status)."},
+			&cli.StringFlag{Name: "status", Usage: "Status is used to fetch the version of the document references by the last status update. Can be used instead of specifying a version."},
+			&cli.BoolFlag{Name: "lock", Usage: "Lock will lock the document for updates. This only affects the creation of new versions of the document, statuses can still be updated."},
+			&cli.StringFlag{Name: "meta-document", Usage: "MetaDocument controls the inclusion of associated meta documents. \"META_INCLUDE\" will include the document if it exists. \"META_ONLY\" will only return the meta document, and will return a not found error if it doesn't exist. (values: META_NONE, META_INCLUDE, META_ONLY)"},
+			&cli.Int64Flag{Name: "meta-document-version", Usage: "MetaDocumentVersion is used to fetch a specific version of meta document. Can not be used with status. If status is specified, the version the meta document had at the time the status was set is returned. If ommited and status is not used, the latest meta document version is returned."},
+			&cli.StringSliceFlag{Name: "subset", Usage: "Subset returns a subset of the document as specified by a list of newsdoc value extractors."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -105,7 +105,7 @@ func documentsGetCommand() *cli.Command {
 func documentsBulkGetCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "bulk-get",
-		Usage: "Call Documents.BulkGet",
+		Usage: "BulkGet loads multiple documents in a single request.",
 		Flags: fileFlag(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -134,11 +134,11 @@ func documentsBulkGetCommand() *cli.Command {
 func documentsGetHistoryCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-history",
-		Usage: "Call Documents.GetHistory",
+		Usage: "GetHistory lists the document version history.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "uuid"},
-			&cli.Int64Flag{Name: "before"},
-			&cli.BoolFlag{Name: "load-statuses"},
+			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to get the history for."},
+			&cli.Int64Flag{Name: "before", Usage: "Before is which version number we should start fetching history from, omit to start with the latest version."},
+			&cli.BoolFlag{Name: "load-statuses", Usage: "LoadStatuses loads any statuses set on the document versions."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -172,7 +172,7 @@ func documentsGetHistoryCommand() *cli.Command {
 func documentsUpdateCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "update",
-		Usage: "Call Documents.Update",
+		Usage: "Update is used to create new document versions, set statuses, update ACLs.",
 		Flags: fileFlag(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -201,7 +201,7 @@ func documentsUpdateCommand() *cli.Command {
 func documentsBulkUpdateCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "bulk-update",
-		Usage: "Call Documents.BulkUpdate",
+		Usage: "BulkUpdate is used to create new document versions, set statuses, update ACLs.",
 		Flags: fileFlag(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -230,7 +230,7 @@ func documentsBulkUpdateCommand() *cli.Command {
 func documentsValidateCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "validate",
-		Usage: "Call Documents.Validate",
+		Usage: "Validate is used to validate a document without writing it to the repository.",
 		Flags: fileFlag(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -259,11 +259,11 @@ func documentsValidateCommand() *cli.Command {
 func documentsEvictCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "evict",
-		Usage: "Call Documents.Evict",
+		Usage: "Evict removes stored document versions from the main database. The evicted data will be restored from the archive if requested again by clients. It's not allowed to evict the current version of a document.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "uuid"},
-			&cli.Int64Flag{Name: "version"},
-			&cli.Int64Flag{Name: "until-version"},
+			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to evict versions of."},
+			&cli.Int64Flag{Name: "version", Usage: "Version can be set to a specific version to evict, optional."},
+			&cli.Int64Flag{Name: "until-version", Usage: "UntilVersion can be set to evict all versions up to (inclusive) the specified version, optional. A negative value will be interpreted as relative to the current version, set to -1 to evict all non-current versions."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -297,12 +297,12 @@ func documentsEvictCommand() *cli.Command {
 func documentsDeleteCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "delete",
-		Usage: "Call Documents.Delete",
+		Usage: "Delete deletes a document and all its associated data.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "uuid"},
-			&cli.StringMapFlag{Name: "meta"},
-			&cli.Int64Flag{Name: "if-match"},
-			&cli.StringFlag{Name: "lockToken"},
+			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to delete."},
+			&cli.StringMapFlag{Name: "meta", Usage: "Meta data to include with the delete record."},
+			&cli.Int64Flag{Name: "if-match", Usage: "IfMatch is used for optimistic locks. Set to the version that you require to be the current one for the delete to be performed."},
+			&cli.StringFlag{Name: "lockToken", Usage: "LockToken is used for explicit pessimistic locking."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -339,12 +339,12 @@ func documentsDeleteCommand() *cli.Command {
 func documentsListDeletedCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "list-deleted",
-		Usage: "Call Documents.ListDeleted",
+		Usage: "ListDeleted lists deleted document instances for a UUID.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "uuid"},
-			&cli.Int64Flag{Name: "before-id"},
-			&cli.StringFlag{Name: "before-date"},
-			&cli.StringFlag{Name: "timezone"},
+			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document list deletions of. Optional."},
+			&cli.Int64Flag{Name: "before-id", Usage: "BeforeID is used to paginate backwards in deletions. Optional."},
+			&cli.StringFlag{Name: "before-date", Usage: "BeforeDate is used to get deletions going back from before the specified date YYYY-MM-DD. Optional, will be ignored if before_id is specified."},
+			&cli.StringFlag{Name: "timezone", Usage: "Timezone that the date should be interpreted in."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -379,7 +379,7 @@ func documentsListDeletedCommand() *cli.Command {
 func documentsRestoreCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "restore",
-		Usage: "Call Documents.Restore",
+		Usage: "Restore recovers a deleted document.",
 		Flags: fileFlag(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -408,10 +408,10 @@ func documentsRestoreCommand() *cli.Command {
 func documentsPurgeCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "purge",
-		Usage: "Call Documents.Purge",
+		Usage: "Purge removes a deleted document completely.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "uuid"},
-			&cli.Int64Flag{Name: "delete-record-id"},
+			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to purge."},
+			&cli.Int64Flag{Name: "delete-record-id", Usage: "DeleteRecordID for the specific instance of the document that should be purged."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -444,9 +444,9 @@ func documentsPurgeCommand() *cli.Command {
 func documentsGetMetaCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-meta",
-		Usage: "Call Documents.GetMeta",
+		Usage: "GetMeta returns metadata for a document, including the ACL and current status heads.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "uuid"},
+			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to get metadata for"},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -478,12 +478,12 @@ func documentsGetMetaCommand() *cli.Command {
 func documentsEventlogCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "eventlog",
-		Usage: "Call Documents.Eventlog",
+		Usage: "Eventlog returns document update events, optionally waiting for new events.",
 		Flags: append([]cli.Flag{
-			&cli.Int64Flag{Name: "after"},
-			&cli.Int64Flag{Name: "wait-ms"},
-			&cli.Int64Flag{Name: "batch-size"},
-			&cli.Int64Flag{Name: "batch-wait-ms"},
+			&cli.Int64Flag{Name: "after", Usage: "After specifies the event ID after which to start returning events. A negative value of -N will start from the N most recent events."},
+			&cli.Int64Flag{Name: "wait-ms", Usage: "Wait is the maximum time to wait for new events. Defaults to 2000."},
+			&cli.Int64Flag{Name: "batch-size", Usage: "BatchSize is the number of events we want in the response. Defaults to 10."},
+			&cli.Int64Flag{Name: "batch-wait-ms", Usage: "BatchWaitMs is the maximum time we wait for a batch to be filled. Defaults to 200."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -518,13 +518,13 @@ func documentsEventlogCommand() *cli.Command {
 func documentsCompactedEventlogCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "compacted-eventlog",
-		Usage: "Call Documents.CompactedEventlog",
+		Usage: "CompactedEventlog returns document update events. If more than one event has occured for a document in the given window only the latest will be returned.",
 		Flags: append([]cli.Flag{
-			&cli.Int64Flag{Name: "after"},
-			&cli.Int64Flag{Name: "until"},
-			&cli.Int64Flag{Name: "limit"},
-			&cli.Int64Flag{Name: "offset"},
-			&cli.StringFlag{Name: "type"},
+			&cli.Int64Flag{Name: "after", Usage: "After specifies the event ID after which to start returning events."},
+			&cli.Int64Flag{Name: "until", Usage: "Until allows us to control the number of events we want to evaluate when compacting. Must be between 1 and 10000 more than `after`, and cannot be greater than the current last event."},
+			&cli.Int64Flag{Name: "limit", Usage: "Limit restricts the number of events we want returned for each call. Together with `offset` this allows us to page through the unique document events between `after` and `until`. Defaults to 0, meaning no limit."},
+			&cli.Int64Flag{Name: "offset", Usage: "Offset allows us to skip N number of events relative to `after`. So while `after` and until allows us to paginate through the log as a whole, `offset` and `limit` allows us to page through the unique document events between `after` and `until`. Defaults to 0, meaning no offset."},
+			&cli.StringFlag{Name: "type", Usage: "Type is used to only return events for documents of the given type. Defaults to empty, which will return events for all document types."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -560,11 +560,11 @@ func documentsCompactedEventlogCommand() *cli.Command {
 func documentsGetStatusCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-status",
-		Usage: "Call Documents.GetStatus",
+		Usage: "GetStatus returns a single status for a document.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "uuid"},
-			&cli.StringFlag{Name: "name"},
-			&cli.Int64Flag{Name: "id"},
+			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to get the status history for."},
+			&cli.StringFlag{Name: "name", Usage: "Name of the status to get."},
+			&cli.Int64Flag{Name: "id", Usage: "ID of the status to get. Optional, will default to the latest status."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -598,11 +598,11 @@ func documentsGetStatusCommand() *cli.Command {
 func documentsGetStatusHistoryCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-status-history",
-		Usage: "Call Documents.GetStatusHistory",
+		Usage: "GetStatusHistory returns the history of a status for a document.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "uuid"},
-			&cli.StringFlag{Name: "name"},
-			&cli.Int64Flag{Name: "before"},
+			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to get the status history for."},
+			&cli.StringFlag{Name: "name", Usage: "Name of the status to get."},
+			&cli.Int64Flag{Name: "before", Usage: "Before is a status ID used to page backwards through the status history. If no ID or a zero ID is provided the list will start with the lastest status."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -636,10 +636,10 @@ func documentsGetStatusHistoryCommand() *cli.Command {
 func documentsGetNilStatusesCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-nil-statuses",
-		Usage: "Call Documents.GetNilStatuses",
+		Usage: "GetNilStatuses returns all the statuses for a document where version is -1.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "uuid"},
-			&cli.StringSliceFlag{Name: "names"},
+			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to get the nil statuses for."},
+			&cli.StringSliceFlag{Name: "names", Usage: "Names of statuses to get, optional. Defaults to all statuses."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -674,11 +674,11 @@ func documentsGetNilStatusesCommand() *cli.Command {
 func documentsGetStatusOverviewCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-status-overview",
-		Usage: "Call Documents.GetStatusOverview",
+		Usage: "GetStatusOverview returns the current version and a set of statuses for a gven list of documents.",
 		Flags: append([]cli.Flag{
-			&cli.StringSliceFlag{Name: "uuids"},
-			&cli.StringSliceFlag{Name: "statuses"},
-			&cli.BoolFlag{Name: "get-meta"},
+			&cli.StringSliceFlag{Name: "uuids", Usage: "UUIDs to get statuses for."},
+			&cli.StringSliceFlag{Name: "statuses", Usage: "Statuses to return information for. Optional, omit to only return workflow state."},
+			&cli.BoolFlag{Name: "get-meta", Usage: "GetMeta can be used to load any set status metadata."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -716,9 +716,9 @@ func documentsGetStatusOverviewCommand() *cli.Command {
 func documentsGetPermissionsCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-permissions",
-		Usage: "Call Documents.GetPermissions",
+		Usage: "GetPermissions returns the permissions you have for the document.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "uuid"},
+			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to get the permissions for."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -750,12 +750,12 @@ func documentsGetPermissionsCommand() *cli.Command {
 func documentsLockCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "lock",
-		Usage: "Call Documents.Lock",
+		Usage: "Lock attempts to acquire a write lock on a document.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "uuid"},
-			&cli.Int64Flag{Name: "ttl"},
-			&cli.StringFlag{Name: "app"},
-			&cli.StringFlag{Name: "comment"},
+			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to lock"},
+			&cli.Int64Flag{Name: "ttl", Usage: "Lock TTL in milliseconds"},
+			&cli.StringFlag{Name: "app", Usage: "Name of the locking application. Optional."},
+			&cli.StringFlag{Name: "comment", Usage: "Free-form comment string. Optional."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -790,11 +790,11 @@ func documentsLockCommand() *cli.Command {
 func documentsExtendLockCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "extend-lock",
-		Usage: "Call Documents.ExtendLock",
+		Usage: "ExtendLock extends the expiration of an existing lock.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "uuid"},
-			&cli.Int64Flag{Name: "ttl"},
-			&cli.StringFlag{Name: "token"},
+			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to extend the lock for."},
+			&cli.Int64Flag{Name: "ttl", Usage: "Lock TTL in milliseconds."},
+			&cli.StringFlag{Name: "token", Usage: "Lock token in UUID format."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -828,10 +828,10 @@ func documentsExtendLockCommand() *cli.Command {
 func documentsUnlockCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "unlock",
-		Usage: "Call Documents.Unlock",
+		Usage: "Unlock releases a write lock on a document.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "uuid"},
-			&cli.StringFlag{Name: "token"},
+			&cli.StringFlag{Name: "uuid", Usage: "UUID of the document to unlock"},
+			&cli.StringFlag{Name: "token", Usage: "Lock token in UUID format."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -864,7 +864,7 @@ func documentsUnlockCommand() *cli.Command {
 func documentsGetWithheldCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-withheld",
-		Usage: "Call Documents.GetWithheld",
+		Usage: "GetWithheld returns the next upcoming scheduled publish actions. This is not a complete list, but a list of the next N documents that are considered eligible for publishing.",
 		Flags: append([]cli.Flag{}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -893,9 +893,9 @@ func documentsGetWithheldCommand() *cli.Command {
 func documentsGetDeliverableInfoCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-deliverable-info",
-		Usage: "Call Documents.GetDeliverableInfo",
+		Usage: "GetDeliverableInfo returns available information related to the deliverable.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "uuid"},
+			&cli.StringFlag{Name: "uuid", Usage: "UUID of the deliverable."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -927,11 +927,11 @@ func documentsGetDeliverableInfoCommand() *cli.Command {
 func documentsCreateUploadCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "create-upload",
-		Usage: "Call Documents.CreateUpload",
+		Usage: "CreateUpload is used to start the process of uploading objects that then can be attached to a document.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "name"},
-			&cli.StringFlag{Name: "content-type"},
-			&cli.StringMapFlag{Name: "meta"},
+			&cli.StringFlag{Name: "name", Usage: "Name of the uploaded file, this should be the basename of the file."},
+			&cli.StringFlag{Name: "content-type", Usage: "ContentType is the type of the file as a mimetype."},
+			&cli.StringMapFlag{Name: "meta", Usage: "Meta can be used to set arbitrary key-value data on an upload."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -967,11 +967,11 @@ func documentsCreateUploadCommand() *cli.Command {
 func documentsGetAttachmentsCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-attachments",
-		Usage: "Call Documents.GetAttachments",
+		Usage: "GetAttachments returns download links for the requested attachments.",
 		Flags: append([]cli.Flag{
-			&cli.StringSliceFlag{Name: "documents"},
-			&cli.StringFlag{Name: "attachment-name"},
-			&cli.BoolFlag{Name: "download-link"},
+			&cli.StringSliceFlag{Name: "documents", Usage: "Documents to get attachments for."},
+			&cli.StringFlag{Name: "attachment-name", Usage: "Attachment name to get information for."},
+			&cli.BoolFlag{Name: "download-link", Usage: "DownloadLink should be set to true to generate a download link."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -1007,7 +1007,7 @@ func documentsGetAttachmentsCommand() *cli.Command {
 func documentsGetMatchingCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-matching",
-		Usage: "Call Documents.GetMatching",
+		Usage: "GetMatching returns documents matching the given criteria.",
 		Flags: fileFlag(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")
@@ -1036,7 +1036,7 @@ func documentsGetMatchingCommand() *cli.Command {
 func documentsGetSocketTokenCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-socket-token",
-		Usage: "Call Documents.GetSocketToken",
+		Usage: "GetSocketToken returns a token that can be used to open socket connections.",
 		Flags: append([]cli.Flag{}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "repository")

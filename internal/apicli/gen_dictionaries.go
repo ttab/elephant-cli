@@ -13,7 +13,7 @@ import (
 func dictionariesServiceCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "dictionaries",
-		Usage: "Dictionaries service commands",
+		Usage: "Dictionaries is used to manage custom dictionary entries. Custom dictionaries can be used to add both words and phrases.",
 		Commands: []*cli.Command{
 			dictionariesSupportedLanguagesCommand(),
 			dictionariesListDictionariesCommand(),
@@ -28,7 +28,7 @@ func dictionariesServiceCommand() *cli.Command {
 func dictionariesSupportedLanguagesCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "supported-languages",
-		Usage: "Call Dictionaries.SupportedLanguages",
+		Usage: "SupportedLanguages returns a list of supported languages.",
 		Flags: append([]cli.Flag{}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "spell")
@@ -57,7 +57,7 @@ func dictionariesSupportedLanguagesCommand() *cli.Command {
 func dictionariesListDictionariesCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "list-dictionaries",
-		Usage: "Call Dictionaries.ListDictionaries",
+		Usage: "ListDictionaries lists the currently available custom dictionaries.",
 		Flags: append([]cli.Flag{}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "spell")
@@ -86,12 +86,12 @@ func dictionariesListDictionariesCommand() *cli.Command {
 func dictionariesListEntriesCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "list-entries",
-		Usage: "Call Dictionaries.ListEntries",
+		Usage: "ListEntries lists entries in the custom dictionaries.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "language"},
-			&cli.Int64Flag{Name: "page"},
-			&cli.StringFlag{Name: "prefix"},
-			&cli.StringFlag{Name: "status"},
+			&cli.StringFlag{Name: "language", Usage: "Language to list entries for."},
+			&cli.Int64Flag{Name: "page", Usage: "Page to return."},
+			&cli.StringFlag{Name: "prefix", Usage: "Prefix to filter entries by."},
+			&cli.StringFlag{Name: "status", Usage: "Status to filter entries by"},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "spell")
@@ -126,10 +126,10 @@ func dictionariesListEntriesCommand() *cli.Command {
 func dictionariesGetEntryCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "get-entry",
-		Usage: "Call Dictionaries.GetEntry",
+		Usage: "GetEntry returns the details of a custom word or phrase.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "language"},
-			&cli.StringFlag{Name: "text"},
+			&cli.StringFlag{Name: "language", Usage: "Language the entry is for."},
+			&cli.StringFlag{Name: "text", Usage: "Text is the word or phrase to get the entry for."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "spell")
@@ -162,7 +162,7 @@ func dictionariesGetEntryCommand() *cli.Command {
 func dictionariesSetEntryCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "set-entry",
-		Usage: "Call Dictionaries.SetEntry",
+		Usage: "SetEntry is used to add or update custom dictionary entries.",
 		Flags: fileFlag(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "spell")
@@ -191,10 +191,10 @@ func dictionariesSetEntryCommand() *cli.Command {
 func dictionariesDeleteEntryCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "delete-entry",
-		Usage: "Call Dictionaries.DeleteEntry",
+		Usage: "DeleteEntry is used to remove an entry.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "language"},
-			&cli.StringFlag{Name: "text"},
+			&cli.StringFlag{Name: "language", Usage: "Language the entry is for."},
+			&cli.StringFlag{Name: "text", Usage: "Text is the word or phrase to delete."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "spell")

@@ -29,13 +29,13 @@ func messagesServiceCommand() *cli.Command {
 func messagesPushMessageCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "push-message",
-		Usage: "Call Messages.PushMessage",
+		Usage: "Pushes a new message to a recipient.",
 		Flags: append([]cli.Flag{
-			&cli.StringFlag{Name: "type"},
-			&cli.StringFlag{Name: "recipient"},
-			&cli.StringFlag{Name: "doc-uuid"},
-			&cli.StringFlag{Name: "doc-type"},
-			&cli.StringMapFlag{Name: "payload"},
+			&cli.StringFlag{Name: "type", Usage: "Type of message being sent (e.g. \"rpc_error\")."},
+			&cli.StringFlag{Name: "recipient", Usage: "Recipient of the message (user sub)."},
+			&cli.StringFlag{Name: "doc-uuid", Usage: "UUID of the associated document, optional."},
+			&cli.StringFlag{Name: "doc-type", Usage: "Type of the associated document, optional."},
+			&cli.StringMapFlag{Name: "payload", Usage: "Payload containing a key-value map."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "user")
@@ -73,7 +73,7 @@ func messagesPushMessageCommand() *cli.Command {
 func messagesPushInboxMessageCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "push-inbox-message",
-		Usage: "Call Messages.PushInboxMessage",
+		Usage: "Pushes a new inbox message to a recipient.",
 		Flags: fileFlag(),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "user")
@@ -102,9 +102,9 @@ func messagesPushInboxMessageCommand() *cli.Command {
 func messagesPollMessagesCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "poll-messages",
-		Usage: "Call Messages.PollMessages",
+		Usage: "Polls for new messages for a recipient.",
 		Flags: append([]cli.Flag{
-			&cli.Int64Flag{Name: "after-id"},
+			&cli.Int64Flag{Name: "after-id", Usage: "ID of the message after which to start returning messages. Set to -1 for the initial request."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "user")
@@ -136,9 +136,9 @@ func messagesPollMessagesCommand() *cli.Command {
 func messagesPollInboxMessagesCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "poll-inbox-messages",
-		Usage: "Call Messages.PollInboxMessages",
+		Usage: "Polls for new inbox messages for a recipient.",
 		Flags: append([]cli.Flag{
-			&cli.Int64Flag{Name: "after-id"},
+			&cli.Int64Flag{Name: "after-id", Usage: "ID of the message after which to start returning messages. Set to -1 for the initial request."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "user")
@@ -170,10 +170,10 @@ func messagesPollInboxMessagesCommand() *cli.Command {
 func messagesListInboxMessagesCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "list-inbox-messages",
-		Usage: "Call Messages.ListInboxMessages",
+		Usage: "Lists all inbox messages for a recipient.",
 		Flags: append([]cli.Flag{
-			&cli.Int64Flag{Name: "before-id"},
-			&cli.Int64Flag{Name: "size"},
+			&cli.Int64Flag{Name: "before-id", Usage: "ID of the message before which to list messages."},
+			&cli.Int64Flag{Name: "size", Usage: "Number of messages to include in the results (defaults to 10)."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "user")
@@ -206,10 +206,10 @@ func messagesListInboxMessagesCommand() *cli.Command {
 func messagesUpdateInboxMessageCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "update-inbox-message",
-		Usage: "Call Messages.UpdateInboxMessage",
+		Usage: "Updates an existing inbox message.",
 		Flags: append([]cli.Flag{
-			&cli.Int64Flag{Name: "id"},
-			&cli.BoolFlag{Name: "is-read"},
+			&cli.Int64Flag{Name: "id", Usage: "ID of the message."},
+			&cli.BoolFlag{Name: "is-read", Usage: "Sets the message's read status."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "user")
@@ -242,9 +242,9 @@ func messagesUpdateInboxMessageCommand() *cli.Command {
 func messagesDeleteInboxMessageCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "delete-inbox-message",
-		Usage: "Call Messages.DeleteInboxMessage",
+		Usage: "Deletes an inbox message.",
 		Flags: append([]cli.Flag{
-			&cli.Int64Flag{Name: "id"},
+			&cli.Int64Flag{Name: "id", Usage: "ID of the message."},
 		}, fileFlag()...),
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			httpClient, endpoint, err := getClientConfig(ctx, cmd, "user")
