@@ -5,6 +5,7 @@ go 1.25.7
 require (
 	github.com/google/uuid v1.6.0
 	github.com/schollz/progressbar/v3 v3.19.0
+	github.com/toon-format/toon-go v0.0.0-20251202084852-7ca0e27c4e8c
 	github.com/ttab/clitools v1.0.0
 	github.com/ttab/elephant-api v0.21.3
 	github.com/ttab/elephantine v0.25.0
@@ -22,7 +23,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/danjacques/gofslock v0.0.0-20240212154529-d899e02bfe22 // indirect
-	github.com/go-jose/go-jose/v4 v4.1.3 // indirect
+	github.com/go-jose/go-jose/v4 v4.1.4 // indirect
 	github.com/golang-jwt/jwt/v5 v5.3.1 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
@@ -51,10 +52,10 @@ require (
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/ttab/newsdoc v1.0.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
-	golang.org/x/net v0.52.0 // indirect
+	golang.org/x/net v0.53.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
-	golang.org/x/sys v0.42.0 // indirect
-	golang.org/x/term v0.41.0 // indirect
-	golang.org/x/text v0.35.0 // indirect
+	golang.org/x/sys v0.43.0 // indirect
+	golang.org/x/term v0.42.0 // indirect
+	golang.org/x/text v0.36.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
 )

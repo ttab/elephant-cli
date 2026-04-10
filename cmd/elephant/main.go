@@ -10,6 +10,7 @@ import (
 	"github.com/ttab/clitools"
 	"github.com/ttab/elephant-api/index"
 	"github.com/ttab/elephant-api/repository"
+	"github.com/ttab/elephant-cli/internal/apicli"
 	"github.com/urfave/cli/v3"
 	"golang.org/x/oauth2"
 )
@@ -188,29 +189,43 @@ func main() {
 		},
 	}
 
+	commands := []*cli.Command{
+		&docVersionsCommand,
+		&downloadDocCommand,
+		&uploadDocCommand,
+		&copyDocumentCommand,
+		&copyDocumentsCommand,
+		&listDocumentsCommand,
+		&searchCommand,
+		&setStatusCommand,
+		&runListCommand,
+		clitools.ConfigureCliCommands(
+			appName, clitools.DefaultApplicationID,
+		),
+	}
+
+	commands = append(commands, apicli.AllServiceCommands()...)
+
 	app := cli.Command{
-		Name:  "elephant",
-		Usage: "The elephant cli tool",
-		Commands: []*cli.Command{
-			&docVersionsCommand,
-			&downloadDocCommand,
-			&uploadDocCommand,
-			&copyDocumentCommand,
-			&copyDocumentsCommand,
-			&listDocumentsCommand,
-			&searchCommand,
-			&setStatusCommand,
-			&runListCommand,
-			clitools.ConfigureCliCommands(
-				appName, clitools.DefaultApplicationID,
-			),
-		},
+		Name:     "elephant",
+		Usage:    "The elephant cli tool",
+		Commands: commands,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    "env",
 				Usage:   "Environment (local/stage/prod)",
 				Sources: cli.EnvVars("ENV"),
 				Value:   "stage",
+			},
+			&cli.StringSliceFlag{
+				Name:    "scopes",
+				Usage:   "OAuth2 scopes to request",
+				Sources: cli.EnvVars("ELEPHANT_SCOPES"),
+				Value:   apicli.DefaultScopes,
+			},
+			&cli.BoolFlag{
+				Name:  "fmt-toon",
+				Usage: "Use toon format for input/output instead of JSON",
 			},
 		},
 	}
