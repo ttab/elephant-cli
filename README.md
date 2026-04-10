@@ -142,12 +142,24 @@ and `--scopes` flags control which environment and permissions the assistant get
 
 ### Tools exposed
 
+**Core tools:**
+
 | Tool | Description |
 |------|-------------|
 | `elephant_list_services` | List all services and methods for discovery |
 | `elephant_search_methods` | Search methods by keyword in names and descriptions |
 | `elephant_get_schema` | Get the JSON Schema for a method's request or response |
 | `elephant_call` | Invoke an API method with a JSON payload |
+
+**Schema and index tools:**
+
+| Tool | Description |
+|------|-------------|
+| `elephant_schema_overview` | List active validation schemas with declared/extended document types |
+| `elephant_type_constraints` | Get allowed meta, content, and link blocks for a document type |
+| `elephant_resolve_ref` | Look up a reusable block definition by its ref URI |
+| `elephant_enum_values` | Get allowed values for an enum reference |
+| `elephant_index_mappings` | Search index field mappings for a document type, with optional name filter |
 
 ### Registering with Claude Code (stdio)
 
