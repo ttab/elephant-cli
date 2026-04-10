@@ -92,6 +92,14 @@ elephant <service> <method> [flags]
 | `check` | spell.Check | spell |
 | `dictionaries` | spell.Dictionaries | spell |
 | `replication` | replicant.Replication | replicant |
+| `tagger` | eidos.Tagger | eidos2 |
+| `assets` | baboon.Assets | baboon |
+| `print` | baboon.Print | baboon |
+| `manage` | everysport.Manage | everysport |
+| `metadata` | ntb.Metadata | ntb |
+| `media` | ntb.Media | ntb |
+| `nynorsk` | ntb.Nynorsk | ntb |
+| `rss-feed` | wires.RssFeed | wires |
 
 ### Using flags
 
