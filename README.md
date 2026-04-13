@@ -16,8 +16,9 @@ Before using the CLI, configure the environment with the OIDC provider and base
 URL:
 
 ```sh
-elephant --env prod configure --oidc https://auth.example.com/realms/elephant
-elephant --env prod configure --base-url https://example.com
+elephant --env prod configure \
+    --base-url https://example.com \
+    --oidc https://auth.example.com/realms/elephant
 ```
 
 Individual endpoints can be overridden:
