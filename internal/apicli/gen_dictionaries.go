@@ -226,6 +226,14 @@ func dictionariesListEntriesCommand() *cli.Command {
           "text": {
             "description": "Text is the word (or phrase) itself.",
             "type": "string"
+          },
+          "updated": {
+            "description": "Updated is the last update time in RFC3339 format.",
+            "type": "string"
+          },
+          "updatedBy": {
+            "description": "UpdatedBy is the identity of the party that last updated the entry.",
+            "type": "string"
           }
         },
         "type": "object"
@@ -337,6 +345,14 @@ func dictionariesGetEntryCommand() *cli.Command {
         "text": {
           "description": "Text is the word (or phrase) itself.",
           "type": "string"
+        },
+        "updated": {
+          "description": "Updated is the last update time in RFC3339 format.",
+          "type": "string"
+        },
+        "updatedBy": {
+          "description": "UpdatedBy is the identity of the party that last updated the entry.",
+          "type": "string"
         }
       },
       "type": "object"
@@ -423,6 +439,14 @@ func dictionariesSetEntryCommand() *cli.Command {
         },
         "text": {
           "description": "Text is the word (or phrase) itself.",
+          "type": "string"
+        },
+        "updated": {
+          "description": "Updated is the last update time in RFC3339 format.",
+          "type": "string"
+        },
+        "updatedBy": {
+          "description": "UpdatedBy is the identity of the party that last updated the entry.",
           "type": "string"
         }
       },

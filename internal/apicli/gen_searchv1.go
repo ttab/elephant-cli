@@ -849,8 +849,22 @@ func searchV1QueryCommand() *cli.Command {
             "fuzziness": {
               "description": "Fuzziness is the maximum edit distance allowed for matching.",
               "properties": {
+                "auto": {
+                  "description": "Auto enables automatic fuzziness based on the length of the search term. When set, this takes precedence over the edits field. If both low and high are zero, \"AUTO\" is used with the default thresholds (AUTO:3,6). Otherwise, the custom thresholds are used as \"AUTO:low,high\".",
+                  "properties": {
+                    "high": {
+                      "format": "int64",
+                      "type": "string"
+                    },
+                    "low": {
+                      "format": "int64",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
                 "edits": {
-                  "description": "Edits is the maximum allowed Levenshtein Edit Distance (or number of edits).",
+                  "description": "Edits is the maximum allowed Levenshtein Edit Distance (or number of edits). Valid values are 0, 1, and 2.",
                   "format": "int64",
                   "type": "string"
                 }
@@ -1617,8 +1631,12 @@ func searchV1MultiSearchCommand() *cli.Command {
                   "fuzziness": {
                     "description": "Fuzziness is the maximum edit distance allowed for matching.",
                     "properties": {
+                      "auto": {
+                        "description": "Auto enables automatic fuzziness based on the length of the search term. When set, this takes precedence over the edits field. If both low and high are zero, \"AUTO\" is used with the default thresholds (AUTO:3,6). Otherwise, the custom thresholds are used as \"AUTO:low,high\".",
+                        "type": "object"
+                      },
                       "edits": {
-                        "description": "Edits is the maximum allowed Levenshtein Edit Distance (or number of edits).",
+                        "description": "Edits is the maximum allowed Levenshtein Edit Distance (or number of edits). Valid values are 0, 1, and 2.",
                         "format": "int64",
                         "type": "string"
                       }

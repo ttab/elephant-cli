@@ -16,6 +16,7 @@ func metadataServiceCommand() *cli.Command {
 		Usage: "Metadata service for retrieving assignment metadata.",
 		Commands: []*cli.Command{
 			metadataGetAssignmentCommand(),
+			metadataListAssignmentsCommand(),
 		},
 	}
 }
@@ -75,6 +76,74 @@ func metadataGetAssignmentCommand() *cli.Command {
 			res, err := client.GetAssignment(ctx, &req)
 			if err != nil {
 				return fmt.Errorf("call get-assignment: %w", err)
+			}
+
+			return writeResponse(cmd, res)
+		},
+	}
+}
+
+func metadataListAssignmentsCommand() *cli.Command {
+	return &cli.Command{
+		Name:  "list-assignments",
+		Usage: "ListAssignments returns metadata for all assignments.",
+		Flags: append([]cli.Flag{}, methodFlags()...),
+		Action: func(ctx context.Context, cmd *cli.Command) error {
+			if cmd.Bool("req-schema") {
+				fmt.Println(`{
+  "type": "object"
+}`)
+				return nil
+			}
+
+			if cmd.Bool("res-schema") {
+				fmt.Println(`{
+  "properties": {
+    "assignments": {
+      "items": {
+        "properties": {
+          "assigneeName": {
+            "type": "string"
+          },
+          "assigneeUuid": {
+            "type": "string"
+          },
+          "assignmentUuid": {
+            "type": "string"
+          },
+          "commissionCode": {
+            "type": "string"
+          },
+          "planningUuid": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}`)
+				return nil
+			}
+
+			httpClient, endpoint, err := getClientConfig(ctx, cmd, "ntb")
+			if err != nil {
+				return err
+			}
+
+			client := ntb.NewMetadataProtobufClient(endpoint, httpClient)
+
+			var req ntb.ListAssignmentsRequest
+
+			if err := readRequest(cmd, &req); err != nil {
+				return err
+			}
+
+			res, err := client.ListAssignments(ctx, &req)
+			if err != nil {
+				return fmt.Errorf("call list-assignments: %w", err)
 			}
 
 			return writeResponse(cmd, res)
