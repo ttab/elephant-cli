@@ -6,7 +6,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/schollz/progressbar/v3 v3.19.0
 	github.com/toon-format/toon-go v0.0.0-20251202084852-7ca0e27c4e8c
-	github.com/ttab/clitools v1.0.3
+	github.com/ttab/clitools v1.1.1
 	github.com/ttab/elephant-api v0.22.4
 	github.com/ttab/elephant-tt-api v0.5.1
 	github.com/ttab/elephantine v0.26.2

@@ -12,14 +12,27 @@ go install github.com/ttab/elephant-cli/cmd/elephant@latest
 
 ## Configuration
 
-Before using the CLI, configure the environment with the OIDC provider and base
-URL:
+Before using the CLI, configure the environments. On a new machine the quickest
+way is to set up the well-known ones: `tt-stage`, `tt-prod`, `ntb-stage` and
+`ntb-prod`, with `stage` and `prod` as aliases for the TT ones unless they are
+already configured:
+
+```sh
+elephant configure --well-known
+```
+
+A bare `elephant configure` in a terminal offers to do the same. Any other
+environment is configured with its OIDC provider and base URL:
 
 ```sh
 elephant --env prod configure \
     --base-url https://example.com \
     --oidc https://auth.example.com/realms/elephant
 ```
+
+`elephant configure list` shows what is configured. The configuration is
+shared with every other tool built on
+[clitools](https://github.com/ttab/clitools#well-known-environments).
 
 Individual endpoints can be overridden:
 

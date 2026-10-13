@@ -99,8 +99,8 @@ github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
 github.com/toon-format/toon-go v0.0.0-20251202084852-7ca0e27c4e8c h1:D8lDFovBMZywze1eh9iwMLcYor5f11mHBocLhO7cBe8=
 github.com/toon-format/toon-go v0.0.0-20251202084852-7ca0e27c4e8c/go.mod h1:j/BOnpF2ihnz4lELs99h9mwGJBx/zdleOUCnLLRPCsc=
-github.com/ttab/clitools v1.0.3 h1:l1NrC7c1pBSS4DYokQEugNfSg9csKjk5sUymem9KCig=
-github.com/ttab/clitools v1.0.3/go.mod h1:6Zn/3jv+X/jwhui9rm70KYwI5MmLOzRjCM5fF4ebzg0=
+github.com/ttab/clitools v1.1.1 h1:w8byGb//t/0FPnYPkyAekIkiIPB1Kw9Ju8NvEExUROc=
+github.com/ttab/clitools v1.1.1/go.mod h1:6Zn/3jv+X/jwhui9rm70KYwI5MmLOzRjCM5fF4ebzg0=
 github.com/ttab/elephant-api v0.22.4 h1:tN2mln94+oZ/EgA5xm3H1VRcCgXuTytukM7z66w4cJY=
 github.com/ttab/elephant-api v0.22.4/go.mod h1:Hh093NfYDzq8wS32nhZJzISiu59Xgypiy6CjrAUaLg8=
 github.com/ttab/elephant-tt-api v0.5.1 h1:zvQCIA6In7P0+sXk8KyNjij6GAzCedw4U071OFIrdLk=
