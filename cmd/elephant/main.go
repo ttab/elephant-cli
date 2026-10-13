@@ -94,6 +94,14 @@ func main() {
 				Usage:    "Environment to copy to",
 				Required: true,
 			},
+			&cli.StringFlag{
+				Name:  "status",
+				Usage: "Status to set on the copied document (e.g. usable)",
+			},
+			&cli.StringSliceFlag{
+				Name:  "access",
+				Usage: "ACL entry as 'perms:uri' (e.g. 'rw:core://unit/redaktionen'). Repeat to add more entries; replaces the default ACL when set.",
+			},
 		},
 	}
 
@@ -115,6 +123,14 @@ func main() {
 				Name:     "to-env",
 				Usage:    "Environment to copy to",
 				Required: true,
+			},
+			&cli.StringFlag{
+				Name:  "status",
+				Usage: "Status to set on each copied document (e.g. usable)",
+			},
+			&cli.StringSliceFlag{
+				Name:  "access",
+				Usage: "ACL entry as 'perms:uri' (e.g. 'rw:core://unit/redaktionen'). Repeat to add more entries; replaces the default ACL when set.",
 			},
 		},
 	}
@@ -163,6 +179,26 @@ func main() {
 		},
 	}
 
+	aclUpdateCommand := cli.Command{
+		Name:   "acl-update",
+		Action: aclUpdate,
+		Usage:  "ensure ACL entries are set on a document or every document of a type",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:  "uuid",
+				Usage: "UUID of the document to update",
+			},
+			&cli.StringFlag{
+				Name:  "doc-type",
+				Usage: "Type of documents to update in bulk",
+			},
+			&cli.StringSliceFlag{
+				Name:  "access",
+				Usage: "ACL entry as 'perms:uri' (e.g. 'rw:core://unit/redaktionen'). Repeat to add more entries.",
+			},
+		},
+	}
+
 	runListCommand := cli.Command{
 		Name:      "run-list",
 		Action:    runListAction,
@@ -198,6 +234,7 @@ func main() {
 		&listDocumentsCommand,
 		&searchCommand,
 		&setStatusCommand,
+		&aclUpdateCommand,
 		&runListCommand,
 		clitools.ConfigureCliCommands(
 			appName, clitools.DefaultApplicationID,

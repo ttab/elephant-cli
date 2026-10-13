@@ -67,7 +67,65 @@ These are hand-written commands with tailored workflows:
 | `docs-list` | List documents by type |
 | `search` | Query the index with a JSON query from stdin |
 | `set-status` | Update document status |
+| `acl-update` | Ensure ACL entries are set on a document or every document of a type |
 | `run-list` | Batch process documents from a CSV file |
+
+### Copying documents
+
+`doc-copy` copies a single document from the current `--env` to `--to-env`.
+`docs-copy` copies every document of a given type and prompts before writing.
+Both take the same set of flags for status and ACL handling:
+
+```sh
+elephant --env prod doc-copy --to-env stage \
+    --uuid 7a3f08c1-b252-4b4a-af3e-b9301ed3b05a \
+    --status usable
+
+elephant --env prod docs-copy --to-env stage \
+    --doc-type core/article \
+    --status usable \
+    --access rw:core://unit/redaktionen \
+    --access r:core://unit/wires
+```
+
+| Flag | Applies to | Description |
+|------|------------|-------------|
+| `--uuid` | `doc-copy` | UUID of the document to copy |
+| `--doc-type` | `docs-copy` | Document type to copy in bulk |
+| `--to-env` | both | Target environment |
+| `--attachment` | both | Attachment name to copy. Defaults to a known name based on the document type (`image` for `core/image`, `logo` for `tt/tv-channel`, `layout` for `tt/print-layout`) |
+| `--status` | both | Status to set on the new version (e.g. `usable`). Bundled with the document update so it applies to the version being written |
+| `--access` | both | ACL entry as `perms:uri`, e.g. `rw:core://unit/redaktionen`. Repeat to build a multi-entry ACL. The permission characters are split into individual permissions (`rw` → `r`, `w`) |
+
+When `--access` is omitted the copy uses a default ACL of
+`rw:core://unit/redaktionen`. Supplying any `--access` flag replaces that
+default — entries are not merged, so include `core://unit/redaktionen`
+explicitly if you still want it.
+
+### Updating ACLs in place
+
+`acl-update` ensures that the supplied access entries are present on a
+document, or on every document of a given type. It reads the current ACL via
+`GetMeta` and only issues an update for entries whose URI is missing the
+requested permissions. Permissions are merged with whatever is already set for
+the URI, so existing perms are never removed.
+
+```sh
+elephant --env prod acl-update \
+    --uuid 7a3f08c1-b252-4b4a-af3e-b9301ed3b05a \
+    --access rw:core://unit/redaktionen
+
+elephant --env prod acl-update \
+    --doc-type core/article \
+    --access rw:core://unit/redaktionen \
+    --access r:core://unit/wires
+```
+
+| Flag | Description |
+|------|-------------|
+| `--uuid` | UUID of a single document to update |
+| `--doc-type` | Update every document of this type (mutually exclusive with `--uuid`) |
+| `--access` | ACL entry as `perms:uri`. Repeat to set multiple URIs. At least one is required |
 
 ## Generated service commands
 

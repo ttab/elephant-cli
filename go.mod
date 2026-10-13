@@ -7,12 +7,12 @@ require (
 	github.com/schollz/progressbar/v3 v3.19.0
 	github.com/toon-format/toon-go v0.0.0-20251202084852-7ca0e27c4e8c
 	github.com/ttab/clitools v1.0.3
-	github.com/ttab/elephant-api v0.22.2
+	github.com/ttab/elephant-api v0.22.4
 	github.com/ttab/elephant-tt-api v0.5.1
-	github.com/ttab/elephantine v0.26.1
+	github.com/ttab/elephantine v0.26.2
 	github.com/ttab/flerr v0.1.0
 	github.com/twitchtv/twirp v8.1.3+incompatible
-	github.com/urfave/cli/v3 v3.8.0
+	github.com/urfave/cli/v3 v3.9.0
 	golang.org/x/oauth2 v0.36.0
 	google.golang.org/protobuf v1.36.11
 )
@@ -53,10 +53,10 @@ require (
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/ttab/newsdoc v1.0.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
-	golang.org/x/net v0.53.0 // indirect
+	golang.org/x/net v0.54.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
-	golang.org/x/sys v0.43.0 // indirect
-	golang.org/x/term v0.42.0 // indirect
-	golang.org/x/text v0.36.0 // indirect
+	golang.org/x/sys v0.44.0 // indirect
+	golang.org/x/term v0.43.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
 )

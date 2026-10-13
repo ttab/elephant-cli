@@ -249,7 +249,14 @@ func copyDocument(ctx context.Context, cmd *cli.Command) (outErr error) {
 		toEnv      = cmd.String("to-env")
 		docID      = cmd.String("uuid")
 		attachment = cmd.String("attachment")
+		statusName = cmd.String("status")
+		access     = cmd.StringSlice("access")
 	)
+
+	acl, err := buildACL(access)
+	if err != nil {
+		return fmt.Errorf("parse access: %w", err)
+	}
 
 	from, err := getClients(ctx, fromEnv)
 	if err != nil {
@@ -262,7 +269,7 @@ func copyDocument(ctx context.Context, cmd *cli.Command) (outErr error) {
 	}
 
 	err = copySingleDocument(ctx,
-		docID, attachment,
+		docID, attachment, statusName, acl,
 		from.Documents, to.Documents)
 	if err != nil {
 		return err
@@ -278,7 +285,14 @@ func copyDocuments(ctx context.Context, cmd *cli.Command) (outErr error) {
 		docType    = cmd.String("doc-type")
 		skipDocs   = cmd.Int("skip")
 		attachment = cmd.String("attachment")
+		statusName = cmd.String("status")
+		access     = cmd.StringSlice("access")
 	)
+
+	acl, err := buildACL(access)
+	if err != nil {
+		return fmt.Errorf("parse access: %w", err)
+	}
 
 	from, err := getClients(ctx, fromEnv)
 	if err != nil {
@@ -343,7 +357,7 @@ func copyDocuments(ctx context.Context, cmd *cli.Command) (outErr error) {
 	for _, docID := range list {
 		err := copySingleDocument(
 			ctx,
-			docID, attachment,
+			docID, attachment, statusName, acl,
 			from.Documents, to.Documents)
 		if err != nil {
 			return err
@@ -359,6 +373,8 @@ func copySingleDocument(
 	ctx context.Context,
 	docID string,
 	attachment string,
+	statusName string,
+	acl []*repository.ACLEntry,
 	from repository.Documents,
 	to repository.Documents,
 ) error {
@@ -387,22 +403,246 @@ func copySingleDocument(
 		}
 	}
 
-	_, err = to.Update(ctx, &repository.UpdateRequest{
+	req := repository.UpdateRequest{
 		Uuid:          docID,
 		Document:      docRes.Document,
 		AttachObjects: attach,
-		Acl: []*repository.ACLEntry{
-			{
-				Uri:         "core://unit/redaktionen",
-				Permissions: []string{"r", "w"},
-			},
-		},
-	})
+		Acl:           acl,
+	}
+
+	if statusName != "" {
+		req.Status = []*repository.StatusUpdate{
+			{Name: statusName},
+		}
+	}
+
+	_, err = to.Update(ctx, &req)
 	if err != nil {
 		return fmt.Errorf("write document %s: %w", docID, err)
 	}
 
 	return nil
+}
+
+func aclUpdate(ctx context.Context, cmd *cli.Command) error {
+	var (
+		env     = cmd.String("env")
+		docUUID = cmd.String("uuid")
+		docType = cmd.String("doc-type")
+		access  = cmd.StringSlice("access")
+	)
+
+	if (docUUID == "") == (docType == "") {
+		return errors.New("either --uuid or --doc-type must be supplied")
+	}
+
+	if len(access) == 0 {
+		return errors.New("at least one --access entry must be supplied")
+	}
+
+	requested, err := buildACL(access)
+	if err != nil {
+		return fmt.Errorf("parse access: %w", err)
+	}
+
+	clients, err := getClients(ctx, env)
+	if err != nil {
+		return err
+	}
+
+	if docUUID != "" {
+		changed, err := ensureACL(ctx, clients.Documents, docUUID, requested)
+		if err != nil {
+			return err
+		}
+
+		if changed {
+			fmt.Println("ACL updated")
+		} else {
+			fmt.Println("ACL already up to date")
+		}
+
+		return nil
+	}
+
+	var list []string
+
+	q := index.QueryRequestV1{
+		DocumentType: docType,
+		Query:        index.MatchAllQuery(),
+		Sort: []*index.SortingV1{
+			{Field: "_id"},
+		},
+	}
+
+	for {
+		res, err := clients.Search.Query(ctx, &q)
+		if err != nil {
+			return fmt.Errorf("list document UUIDs: %w", err)
+		}
+
+		if len(res.Hits.Hits) == 0 {
+			break
+		}
+
+		for _, hit := range res.Hits.Hits {
+			list = append(list, hit.Id)
+			q.SearchAfter = hit.Sort
+		}
+	}
+
+	ok := askForConfirmation(
+		fmt.Sprintf("Update ACL on %d documents", len(list)))
+	if !ok {
+		return nil
+	}
+
+	if len(list) > 500 {
+		ok := askForConfirmation("Are you SURE? That is a lot of documents.")
+		if !ok {
+			return nil
+		}
+	}
+
+	bar := progressbar.Default(int64(len(list)))
+
+	for _, id := range list {
+		_, err := ensureACL(ctx, clients.Documents, id, requested)
+		if err != nil {
+			return err
+		}
+
+		_ = bar.Add(1)
+	}
+
+	return nil
+}
+
+func ensureACL(
+	ctx context.Context,
+	docs repository.Documents,
+	docID string,
+	requested []*repository.ACLEntry,
+) (bool, error) {
+	meta, err := docs.GetMeta(ctx, &repository.GetMetaRequest{
+		Uuid: docID,
+	})
+	if err != nil {
+		return false, fmt.Errorf("get meta for %s: %w", docID, err)
+	}
+
+	existing := make(map[string]map[string]bool, len(meta.Meta.Acl))
+
+	for _, e := range meta.Meta.Acl {
+		perms := make(map[string]bool, len(e.Permissions))
+
+		for _, p := range e.Permissions {
+			perms[p] = true
+		}
+
+		existing[e.Uri] = perms
+	}
+
+	var updates []*repository.ACLEntry
+
+	for _, r := range requested {
+		current := existing[r.Uri]
+
+		needsUpdate := false
+
+		for _, p := range r.Permissions {
+			if !current[p] {
+				needsUpdate = true
+
+				break
+			}
+		}
+
+		if !needsUpdate {
+			continue
+		}
+
+		merged := make(map[string]bool, len(current)+len(r.Permissions))
+
+		for p := range current {
+			merged[p] = true
+		}
+
+		for _, p := range r.Permissions {
+			merged[p] = true
+		}
+
+		perms := make([]string, 0, len(merged))
+
+		for p := range merged {
+			perms = append(perms, p)
+		}
+
+		slices.Sort(perms)
+
+		updates = append(updates, &repository.ACLEntry{
+			Uri:         r.Uri,
+			Permissions: perms,
+		})
+	}
+
+	if len(updates) == 0 {
+		return false, nil
+	}
+
+	_, err = docs.Update(ctx, &repository.UpdateRequest{
+		Uuid: docID,
+		Acl:  updates,
+	})
+	if err != nil {
+		return false, fmt.Errorf("update ACL for %s: %w", docID, err)
+	}
+
+	return true, nil
+}
+
+func buildACL(entries []string) ([]*repository.ACLEntry, error) {
+	if len(entries) == 0 {
+		return []*repository.ACLEntry{
+			{
+				Uri:         "core://unit/redaktionen",
+				Permissions: []string{"r", "w"},
+			},
+		}, nil
+	}
+
+	acl := make([]*repository.ACLEntry, 0, len(entries))
+
+	for _, e := range entries {
+		perms, uri, ok := strings.Cut(e, ":")
+		if !ok {
+			return nil, fmt.Errorf(
+				"invalid access entry %q: expected 'perms:uri'", e)
+		}
+
+		if perms == "" {
+			return nil, fmt.Errorf(
+				"invalid access entry %q: missing permissions", e)
+		}
+
+		if uri == "" {
+			return nil, fmt.Errorf(
+				"invalid access entry %q: missing uri", e)
+		}
+
+		permList := make([]string, 0, len(perms))
+
+		for _, p := range perms {
+			permList = append(permList, string(p))
+		}
+
+		acl = append(acl, &repository.ACLEntry{
+			Uri:         uri,
+			Permissions: permList,
+		})
+	}
+
+	return acl, nil
 }
 
 var knownAttachments = map[string]string{
